@@ -54,6 +54,12 @@ export class NavbarComponent {
     this.closeAuthModal();
   }
 
+  @HostListener('window:glossfit-auth', ['$event'])
+  onAuthRequest(event: Event): void {
+    const mode = (event as CustomEvent<'signin' | 'signup'>).detail || 'signup';
+    this.openAuthModal(mode);
+  }
+
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     this.isProfileMenuOpen = false;

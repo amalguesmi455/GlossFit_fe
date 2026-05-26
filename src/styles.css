@@ -27,6 +27,87 @@
     color: var(--noir);
     overflow-x: hidden;
   }
+
+  img,
+  svg,
+  video,
+  canvas {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    max-width: 100%;
+  }
+
+  .app-content {
+    padding-top: 74px;
+  }
+
+  .page {
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 1220px;
+    min-height: calc(100vh - 74px);
+    padding: clamp(28px, 5vw, 64px) clamp(18px, 4vw, 48px);
+    width: 100%;
+  }
+
+  .panel,
+  .card {
+    max-width: 100%;
+  }
+
+  .form,
+  .compact-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .field {
+    display: grid;
+    gap: 8px;
+  }
+
+  .field input,
+  .field select,
+  .field textarea {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .btn,
+  button,
+  a {
+    overflow-wrap: anywhere;
+  }
+
+  @media (max-width: 640px) {
+    .app-content {
+      padding-top: 66px;
+    }
+
+    .page {
+      min-height: calc(100vh - 66px);
+      padding: 24px 16px;
+    }
+
+    .panel,
+    .card {
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .form .btn,
+    .panel .btn,
+    .card .btn {
+      justify-content: center;
+      width: 100%;
+    }
+  }
  
   /* NAV */
   nav {

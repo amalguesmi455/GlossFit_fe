@@ -8,14 +8,14 @@
       </p>
 
       <div class="hero-actions">
-        <a class="btn primary" routerLink="/signup">
+        <button class="btn primary" type="button" (click)="openAuthModal('signup')">
           <i class="fa-solid fa-arrow-right"></i>
           Commencer
-        </a>
-        <a class="btn soft" routerLink="/demand">
+        </button>
+        <button class="btn soft" type="button" (click)="openAuthModal('signup')">
           <i class="fa-regular fa-message"></i>
           Demander un style
-        </a>
+        </button>
       </div>
 
       <div class="trust-row" aria-label="Indicateurs">
@@ -24,12 +24,6 @@
         <div><strong>3 min</strong><span>pour ajouter une tenue</span></div>
       </div>
 
-      <div class="section-shortcuts" aria-label="Acces rapide">
-        <a href="#features"><i class="fa-solid fa-star"></i> Fonctionnalites</a>
-        <a href="#about"><i class="fa-solid fa-circle-info"></i> A propos</a>
-        <a href="#pricing"><i class="fa-solid fa-gem"></i> Tarifs</a>
-        <a href="#contact"><i class="fa-regular fa-envelope"></i> Contact</a>
-      </div>
     </div>
 
     <div class="style-studio" aria-label="Apercu de l'application">
@@ -195,7 +189,7 @@
           <li><i class="fa-solid fa-check"></i> Dressing CRUD</li>
           <li><i class="fa-solid fa-check"></i> Demande styliste</li>
         </ul>
-        <a class="btn soft" routerLink="/signup">Commencer</a>
+        <button class="btn soft" type="button" (click)="openAuthModal('signup')">Commencer</button>
       </article>
       <article class="price-card featured-plan">
         <span class="plan-icon"><i class="fa-solid fa-scissors"></i></span>
@@ -207,7 +201,7 @@
           <li><i class="fa-solid fa-check"></i> Contraintes precises</li>
           <li><i class="fa-solid fa-check"></i> Look personnalise</li>
         </ul>
-        <a class="btn primary" routerLink="/demand">Faire une demande</a>
+        <button class="btn primary" type="button" (click)="openAuthModal('signup')">Faire une demande</button>
       </article>
     </div>
   </section>
@@ -219,8 +213,26 @@
       <p>Prepare ton brief et laisse le styliste transformer tes contraintes en style.</p>
     </div>
     <div class="contact-actions">
-      <a class="btn soft" routerLink="/demand"><i class="fa-solid fa-paper-plane"></i> Faire une demande</a>
+      <button class="btn soft" type="button" (click)="openAuthModal('signup')"><i class="fa-solid fa-paper-plane"></i> Faire une demande</button>
       <a class="btn outline" href="mailto:hello@glossfit.com"><i class="fa-regular fa-envelope"></i> hello&#64;glossfit.com</a>
     </div>
   </section>
+
+  <footer class="landing-footer">
+    <div class="footer-row">
+      <a class="footer-logo" href="#hero"><span>G</span>GlossFit</a>
+      <nav class="footer-links" aria-label="Liens footer">
+        <a href="#features">Fonctionnalites</a>
+        <a href="#about">A propos</a>
+        <a href="#pricing">Tarifs</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="footer-meta">
+        <span>&copy; 2026 GlossFit</span>
+        <a href="mailto:hello@glossfit.com" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+        <a href="https://www.instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+      </div>
+    </div>
+  </footer>
 </main>

@@ -34,3 +34,17 @@
     flex-direction: column;
   }
 }
+
+@media (max-width: 560px) {
+  .panel h1 {
+    font-size: clamp(30px, 11vw, 40px);
+  }
+
+  .dressing-layout {
+    gap: 16px;
+  }
+
+  .dressing-item {
+    gap: 12px;
+  }
+}

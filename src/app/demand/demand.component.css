@@ -22,3 +22,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 560px) {
+  .panel h1 {
+    font-size: clamp(32px, 12vw, 46px);
+  }
+
+  .demand-form {
+    margin-top: 18px;
+  }
+}

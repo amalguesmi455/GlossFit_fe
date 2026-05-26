@@ -1,7 +1,6 @@
 .navbar {
-  background: rgba(244, 234, 224, .72);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid transparent;
+  background: transparent;
+
   left: 0;
   position: fixed;
   right: 0;
@@ -706,7 +705,50 @@
 }
 
 @media (max-width: 480px) {
+  .nav-container {
+    padding: 10px 14px;
+  }
+
+  .logo-mark {
+    height: 36px;
+    width: 36px;
+  }
+
   .logo-text {
     font-size: 20px;
+  }
+
+  .auth-modal-backdrop {
+    align-items: stretch;
+    padding: 76px 10px 14px;
+  }
+
+  .auth-modal {
+    border-radius: 14px;
+    max-height: none;
+  }
+
+  .auth-visual {
+    padding: 22px;
+  }
+
+  .auth-visual h2 {
+    font-size: 31px;
+  }
+
+  .auth-visual p {
+    font-size: 14px;
+  }
+
+  .auth-form-panel {
+    padding: 22px;
+  }
+
+  .auth-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .modal-proof {
+    display: none;
   }
 }

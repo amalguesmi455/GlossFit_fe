@@ -23,3 +23,19 @@
   color: var(--text-muted);
   padding: 12px;
 }
+
+@media (max-width: 640px) {
+  .profile-card {
+    min-height: auto;
+  }
+
+  .profile-card h1 {
+    font-size: clamp(32px, 12vw, 48px);
+  }
+
+  .profile-actions {
+    display: grid;
+    gap: 10px;
+    margin-top: 20px;
+  }
+}

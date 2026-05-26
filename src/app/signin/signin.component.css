@@ -46,3 +46,13 @@
   font-weight: 900;
   text-decoration: underline;
 }
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 24px 14px;
+  }
+
+  .auth-card {
+    border-radius: 14px;
+  }
+}
