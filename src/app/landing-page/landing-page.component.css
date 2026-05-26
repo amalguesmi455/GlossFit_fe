@@ -4,8 +4,8 @@
 
 .landing {
   background:
-    radial-gradient(circle at 12% 18%, rgba(246, 176, 176, .56), transparent 28%),
-    radial-gradient(circle at 86% 12%, rgba(140, 0, 0, .12), transparent 22%),
+    radial-gradient(circle at 12% 18%, rgba(227, 182, 174, .56), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgba(164, 110, 81, .12), transparent 22%),
     var(--bg-main);
   color: var(--text-primary);
   overflow: hidden;
@@ -58,7 +58,7 @@
 
 .hero p,
 .section p {
-  color: rgba(74, 4, 4, .72);
+  color: rgba(90, 65, 53, .72);
   font-size: 18px;
   line-height: 1.7;
   margin: 22px 0 0;
@@ -96,18 +96,18 @@
 
 .btn.primary {
   background: var(--button-dark);
-  box-shadow: 0 18px 36px rgba(140, 0, 0, .22);
+  box-shadow: 0 18px 36px rgba(164, 110, 81, .22);
   color: var(--button-text);
 }
 
 .btn.soft {
-  background: rgba(246, 176, 176, .34);
-  border: 1px solid rgba(140, 0, 0, .18);
+  background: rgba(227, 182, 174, .34);
+  border: 1px solid rgba(164, 110, 81, .18);
   color: var(--text-primary);
 }
 
 .trust-row {
-  border-top: 1px solid rgba(140, 0, 0, .16);
+  border-top: 1px solid rgba(164, 110, 81, .16);
   display: flex;
   flex-wrap: wrap;
   gap: 22px;
@@ -131,15 +131,15 @@
 }
 
 .trust-row span {
-  color: rgba(74, 4, 4, .64);
+  color: rgba(90, 65, 53, .64);
   font-size: 13px;
   font-weight: 800;
   margin-top: 6px;
 }
 
 .journey-map {
-  background: rgba(255, 248, 241, .86);
-  border: 1px solid rgba(140, 0, 0, .14);
+  background: rgba(234, 216, 211, .86);
+  border: 1px solid rgba(164, 110, 81, .14);
   border-radius: 22px;
   display: grid;
   gap: 0;
@@ -162,7 +162,7 @@
 }
 
 .journey-map a:hover {
-  background: rgba(246, 176, 176, .32);
+  background: rgba(227, 182, 174, .32);
   transform: translateY(-2px);
 }
 
@@ -179,7 +179,7 @@
 }
 
 .journey-map small {
-  color: rgba(74, 4, 4, .62);
+  color: rgba(90, 65, 53, .62);
   font-weight: 800;
 }
 
@@ -189,10 +189,10 @@
 }
 
 .studio-card {
-  background: rgba(244, 234, 224, .86);
-  border: 1px solid rgba(140, 0, 0, .14);
+  background: rgba(234, 216, 211, .86);
+  border: 1px solid rgba(164, 110, 81, .14);
   border-radius: 24px;
-  box-shadow: 0 24px 60px rgba(74, 4, 4, .14);
+  box-shadow: 0 24px 60px rgba(90, 65, 53, .14);
 }
 
 .main-card {
@@ -254,7 +254,7 @@
 }
 
 .mini-label {
-  color: rgba(74, 4, 4, .64);
+  color: rgba(90, 65, 53, .64);
   display: block;
   font-size: 12px;
   font-weight: 900;
@@ -312,7 +312,7 @@
 }
 
 .stylist-card span {
-  color: rgba(74, 4, 4, .66);
+  color: rgba(90, 65, 53, .66);
   font-size: 13px;
   margin-top: 3px;
 }
@@ -326,7 +326,7 @@
 .features,
 .flow,
 .pricing {
-  background: rgba(255, 248, 241, .48);
+  background: rgba(234, 216, 211, .48);
   border-radius: 28px;
 }
 
@@ -336,7 +336,7 @@
   background: var(--button-dark);
   border: 6px solid var(--bg-main);
   border-radius: 999px;
-  box-shadow: 0 0 0 1px rgba(140, 0, 0, .18);
+  box-shadow: 0 0 0 1px rgba(164, 110, 81, .18);
   content: "";
   height: 18px;
   left: -34px;
@@ -375,10 +375,10 @@
 }
 
 .mood-card {
-  background: rgba(244, 234, 224, .82);
-  border: 1px solid rgba(140, 0, 0, .14);
+  background: rgba(234, 216, 211, .82);
+  border: 1px solid rgba(164, 110, 81, .14);
   border-radius: 26px;
-  box-shadow: 0 22px 46px rgba(74, 4, 4, .09);
+  box-shadow: 0 22px 46px rgba(90, 65, 53, .09);
   color: var(--text-primary);
   overflow: hidden;
   padding: 24px;
@@ -386,7 +386,7 @@
 }
 
 .mood-card::after {
-  background: radial-gradient(circle, rgba(246, 176, 176, .7), transparent 62%);
+  background: radial-gradient(circle, rgba(227, 182, 174, .7), transparent 62%);
   content: "";
   height: 180px;
   position: absolute;
@@ -423,7 +423,7 @@
 }
 
 .mood-card span {
-  color: rgba(74, 4, 4, .68);
+  color: rgba(90, 65, 53, .68);
   font-weight: 700;
   margin-top: 9px;
 }
@@ -440,19 +440,19 @@
 
 .mood-card.photo.one {
   background:
-    linear-gradient(135deg, rgba(140, 0, 0, .22), rgba(246, 176, 176, .58)),
+    linear-gradient(135deg, rgba(164, 110, 81, .22), rgba(227, 182, 174, .58)),
     var(--bg-card);
 }
 
 .mood-card.photo.two {
   background:
-    linear-gradient(135deg, rgba(74, 4, 4, .72), rgba(140, 0, 0, .18)),
+    linear-gradient(135deg, rgba(90, 65, 53, .72), rgba(164, 110, 81, .18)),
     var(--bg-card);
   color: var(--button-text);
 }
 
 .mood-card.photo span {
-  background: rgba(244, 234, 224, .88);
+  background: rgba(234, 216, 211, .88);
   border-radius: 999px;
   color: var(--button-dark);
   padding: 8px 12px;
@@ -473,8 +473,8 @@
 .feature-card,
 .step,
 .price-card {
-  background: rgba(255, 248, 241, .72);
-  border: 1px solid rgba(140, 0, 0, .14);
+  background: rgba(234, 216, 211, .72);
+  border: 1px solid rgba(164, 110, 81, .14);
   border-radius: 22px;
   padding: 22px;
 }
@@ -534,9 +534,9 @@
 
 .audience article {
   background:
-    linear-gradient(135deg, rgba(246, 176, 176, .34), rgba(244, 234, 224, .82)),
+    linear-gradient(135deg, rgba(227, 182, 174, .34), rgba(234, 216, 211, .82)),
     var(--bg-main);
-  border: 1px solid rgba(140, 0, 0, .14);
+  border: 1px solid rgba(164, 110, 81, .14);
   border-radius: 28px;
   min-height: 280px;
   padding: 30px;
@@ -545,7 +545,7 @@
 }
 
 .audience article::after {
-  background: rgba(140, 0, 0, .08);
+  background: rgba(164, 110, 81, .08);
   border-radius: 999px;
   content: "";
   height: 170px;
@@ -675,7 +675,7 @@
 
 .price-card li {
   align-items: center;
-  color: rgba(74, 4, 4, .72);
+  color: rgba(90, 65, 53, .72);
   display: flex;
   font-weight: 800;
   gap: 9px;
@@ -744,12 +744,12 @@
 }
 
 .btn.outline {
-  border: 1px solid rgba(244, 234, 224, .38);
+  border: 1px solid rgba(234, 216, 211, .38);
   color: var(--button-text);
 }
 
 .landing-footer {
-  background: rgb(140 0 0);
+  background: rgb(164 110 81);
   color: var(--button-text);
   padding: 16px clamp(18px, 4vw, 48px);
 }
@@ -789,7 +789,7 @@
 
 .footer-links a,
 .footer-meta {
-  color: rgba(244, 234, 224, .72);
+  color: rgba(234, 216, 211, .72);
   font-size: 13px;
 }
 
@@ -834,7 +834,7 @@
   }
 
   .journey-map a:nth-child(-n + 2) {
-    border-bottom: 1px solid rgba(140, 0, 0, .12);
+    border-bottom: 1px solid rgba(164, 110, 81, .12);
   }
 
   .section-head::before,
@@ -890,7 +890,7 @@
 
   .journey-map a {
     border-right: 0 !important;
-    border-bottom: 1px solid rgba(140, 0, 0, .12);
+    border-bottom: 1px solid rgba(164, 110, 81, .12);
   }
 
   .outfit-card,

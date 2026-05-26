@@ -9,9 +9,9 @@
 }
 
 .navbar.scrolled {
-  background: rgba(244, 234, 224, .96);
-  border-bottom-color: rgba(140, 0, 0, .14);
-  box-shadow: 0 12px 34px rgba(74, 4, 4, .08);
+  background: rgba(234, 216, 211, .96);
+  border-bottom-color: rgba(164, 110, 81, .14);
+  box-shadow: 0 12px 34px rgba(90, 65, 53, .08);
 }
 
 .nav-container {
@@ -44,7 +44,7 @@
   align-items: center;
   background: var(--button-dark);
   border-radius: 4px;
-  box-shadow: 0 10px 24px rgba(140, 0, 0, .22);
+  box-shadow: 0 10px 24px rgba(164, 110, 81, .22);
   color: var(--button-text);
   display: inline-flex;
   font-family: Georgia, "Times New Roman", serif;
@@ -88,7 +88,7 @@
 .nav-link {
   background: transparent;
   border: 0;
-  color: rgba(74, 4, 4, .74);
+  color: rgba(90, 65, 53, .74);
   cursor: pointer;
   font: inherit;
   font-size: 15px;
@@ -137,12 +137,12 @@
 
 .btn-text {
   background: transparent;
-  border: 1px solid rgba(140, 0, 0, .28);
+  border: 1px solid rgba(164, 110, 81, .28);
   color: var(--text-primary);
 }
 
 .btn-text:hover {
-  background: rgba(246, 176, 176, .22);
+  background: rgba(227, 182, 174, .22);
   border-color: var(--button-dark);
   color: var(--button-dark);
 }
@@ -150,7 +150,7 @@
 .btn-primary {
   background: var(--button-dark);
   border: 1px solid var(--button-dark);
-  box-shadow: 0 12px 24px rgba(140, 0, 0, .2);
+  box-shadow: 0 12px 24px rgba(164, 110, 81, .2);
   color: var(--button-text);
 }
 
@@ -162,8 +162,8 @@
 
 .icon-btn {
   align-items: center;
-  background: rgba(244, 234, 224, .82);
-  border: 1px solid rgba(140, 0, 0, .22);
+  background: rgba(234, 216, 211, .82);
+  border: 1px solid rgba(164, 110, 81, .22);
   border-radius: 9px;
   color: var(--button-dark);
   cursor: pointer;
@@ -224,8 +224,8 @@
 
 .user-avatar-btn {
   align-items: center;
-  background: rgba(244, 234, 224, .82);
-  border: 1px solid rgba(140, 0, 0, .22);
+  background: rgba(234, 216, 211, .82);
+  border: 1px solid rgba(164, 110, 81, .22);
   border-radius: 9px;
   color: var(--text-primary);
   cursor: pointer;
@@ -260,7 +260,7 @@
 }
 
 .chevron {
-  color: rgba(74, 4, 4, .55);
+  color: rgba(90, 65, 53, .55);
   height: 14px;
   transition: transform .2s ease;
   width: 14px;
@@ -271,10 +271,10 @@
 }
 
 .dropdown-menu {
-  background: rgba(244, 234, 224, .98);
-  border: 1px solid rgba(140, 0, 0, .16);
+  background: rgba(234, 216, 211, .98);
+  border: 1px solid rgba(164, 110, 81, .16);
   border-radius: 14px;
-  box-shadow: 0 18px 44px rgba(74, 4, 4, .14);
+  box-shadow: 0 18px 44px rgba(90, 65, 53, .14);
   display: none;
   min-width: 220px;
   overflow: hidden;
@@ -289,8 +289,8 @@
 }
 
 .dropdown-header {
-  background: rgba(246, 176, 176, .28);
-  border-bottom: 1px solid rgba(140, 0, 0, .12);
+  background: rgba(227, 182, 174, .28);
+  border-bottom: 1px solid rgba(164, 110, 81, .12);
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -312,7 +312,7 @@
 .dropdown-item {
   background: none;
   border: 0;
-  color: rgba(74, 4, 4, .78);
+  color: rgba(90, 65, 53, .78);
   cursor: pointer;
   display: block;
   font-size: 14px;
@@ -325,18 +325,18 @@
 }
 
 .dropdown-item:hover {
-  background: rgba(246, 176, 176, .26);
+  background: rgba(227, 182, 174, .26);
   color: var(--button-dark);
 }
 
 .dropdown-divider {
-  background: rgba(140, 0, 0, .12);
+  background: rgba(164, 110, 81, .12);
   height: 1px;
   margin: 4px 0;
 }
 
 .dropdown-item.logout:hover {
-  background: rgba(140, 0, 0, .1);
+  background: rgba(164, 110, 81, .1);
 }
 
 .mobile-menu-btn {
@@ -392,8 +392,8 @@
 }
 
 .mobile-menu {
-  background: rgba(244, 234, 224, .98);
-  border-top: 1px solid rgba(140, 0, 0, .12);
+  background: rgba(234, 216, 211, .98);
+  border-top: 1px solid rgba(164, 110, 81, .12);
   display: none;
   margin-top: 12px;
   overflow: hidden;
@@ -401,8 +401,8 @@
 
 .mobile-language {
   align-items: center;
-  background: rgba(246, 176, 176, .22);
-  border: 1px solid rgba(140, 0, 0, .16);
+  background: rgba(227, 182, 174, .22);
+  border: 1px solid rgba(164, 110, 81, .16);
   border-radius: 10px;
   color: var(--text-primary);
   cursor: pointer;
@@ -418,8 +418,8 @@
 .mobile-link {
   background: transparent;
   border: 0;
-  border-bottom: 1px solid rgba(140, 0, 0, .08);
-  color: rgba(74, 4, 4, .78);
+  border-bottom: 1px solid rgba(164, 110, 81, .08);
+  color: rgba(90, 65, 53, .78);
   cursor: pointer;
   display: block;
   font: inherit;
@@ -443,7 +443,7 @@
 
 .mobile-user-info {
   align-items: center;
-  background: rgba(246, 176, 176, .22);
+  background: rgba(227, 182, 174, .22);
   border-radius: 12px;
   display: flex;
   gap: 10px;
@@ -469,8 +469,8 @@
 }
 
 .btn-logout-mobile {
-  background: rgba(140, 0, 0, .1);
-  border: 1px solid rgba(140, 0, 0, .18);
+  background: rgba(164, 110, 81, .1);
+  border: 1px solid rgba(164, 110, 81, .18);
   color: var(--button-dark);
   margin-top: 10px;
   width: 100%;
@@ -478,7 +478,7 @@
 
 .auth-modal-backdrop {
   align-items: center;
-  background: rgba(74, 4, 4, .44);
+  background: rgba(90, 65, 53, .44);
   backdrop-filter: blur(10px);
   display: flex;
   inset: 0;
@@ -489,10 +489,10 @@
 }
 
 .auth-modal {
-  background: rgba(244, 234, 224, .98);
-  border: 1px solid rgba(140, 0, 0, .18);
+  background: rgba(234, 216, 211, .98);
+  border: 1px solid rgba(164, 110, 81, .18);
   border-radius: 18px;
-  box-shadow: 0 34px 90px rgba(74, 4, 4, .3);
+  box-shadow: 0 34px 90px rgba(90, 65, 53, .3);
   display: grid;
   grid-template-columns: .92fr 1.08fr;
   max-height: calc(100vh - 120px);
@@ -504,8 +504,8 @@
 
 .modal-close {
   align-items: center;
-  background: rgba(244, 234, 224, .9);
-  border: 1px solid rgba(140, 0, 0, .18);
+  background: rgba(234, 216, 211, .9);
+  border: 1px solid rgba(164, 110, 81, .18);
   border-radius: 999px;
   color: var(--button-dark);
   cursor: pointer;
@@ -521,7 +521,7 @@
 
 .auth-visual {
   background:
-    radial-gradient(circle at 18% 18%, rgba(246, 176, 176, .72), transparent 34%),
+    radial-gradient(circle at 18% 18%, rgba(227, 182, 174, .72), transparent 34%),
     linear-gradient(145deg, var(--button-dark), var(--text-primary));
   color: var(--button-text);
   min-height: 520px;
@@ -548,7 +548,7 @@
 }
 
 .auth-visual p {
-  color: rgba(244, 234, 224, .78);
+  color: rgba(234, 216, 211, .78);
   font-size: 16px;
   line-height: 1.7;
   margin: 20px 0 0;
@@ -563,10 +563,10 @@
 }
 
 .modal-proof span {
-  background: rgba(244, 234, 224, .12);
-  border: 1px solid rgba(244, 234, 224, .18);
+  background: rgba(234, 216, 211, .12);
+  border: 1px solid rgba(234, 216, 211, .18);
   border-radius: 999px;
-  color: rgba(244, 234, 224, .88);
+  color: rgba(234, 216, 211, .88);
   font-size: 12px;
   font-weight: 900;
   padding: 9px 12px;
@@ -581,8 +581,8 @@
 }
 
 .auth-tabs {
-  background: rgba(246, 176, 176, .22);
-  border: 1px solid rgba(140, 0, 0, .14);
+  background: rgba(227, 182, 174, .22);
+  border: 1px solid rgba(164, 110, 81, .14);
   border-radius: 12px;
   display: grid;
   gap: 6px;
@@ -595,7 +595,7 @@
   background: transparent;
   border: 0;
   border-radius: 8px;
-  color: rgba(74, 4, 4, .68);
+  color: rgba(90, 65, 53, .68);
   cursor: pointer;
   font-weight: 900;
   padding: 11px 12px;
@@ -604,7 +604,7 @@
 .auth-tabs button.active {
   background: var(--bg-main);
   color: var(--button-dark);
-  box-shadow: 0 10px 22px rgba(74, 4, 4, .08);
+  box-shadow: 0 10px 22px rgba(90, 65, 53, .08);
 }
 
 .modal-form {
@@ -622,8 +622,8 @@
 
 .modal-form input,
 .modal-form select {
-  background: rgba(255, 248, 241, .74);
-  border: 1px solid rgba(140, 0, 0, .18);
+  background: rgba(234, 216, 211, .74);
+  border: 1px solid rgba(164, 110, 81, .18);
   border-radius: 10px;
   color: var(--text-primary);
   font: inherit;
@@ -635,7 +635,7 @@
 .modal-form input:focus,
 .modal-form select:focus {
   border-color: var(--button-dark);
-  box-shadow: 0 0 0 3px rgba(246, 176, 176, .34);
+  box-shadow: 0 0 0 3px rgba(227, 182, 174, .34);
 }
 
 .modal-submit {
@@ -645,7 +645,7 @@
 }
 
 .modal-switch {
-  color: rgba(74, 4, 4, .68);
+  color: rgba(90, 65, 53, .68);
   font-size: 14px;
   font-weight: 800;
   margin: 18px 0 0;

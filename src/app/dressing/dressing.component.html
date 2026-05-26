@@ -1,56 +1,110 @@
-<main class="page">
-  <section class="shell dressing-layout">
-    <article class="panel">
-      <p class="eyebrow">Dressing CRUD</p>
-      <h1>Ajouter une piece</h1>
-      <form class="form" (ngSubmit)="addItem()">
+<main class="dressing-page">
+
+
+  <section class="dressing-workspace">
+    <article class="add-panel" id="add-piece">
+      <span class="eyebrow"><i class="fa-solid fa-camera-retro"></i> Nouvelle piece</span>
+      <h2>Ajouter une piece</h2>
+      <p class="panel-intro">Plus les infos sont propres, plus les suggestions de look seront utiles.</p>
+
+      <form class="form dressing-form" (ngSubmit)="addItem()">
         <div class="field">
           <label for="item-name">Nom de la piece</label>
           <input id="item-name" name="name" [(ngModel)]="newItem.name" placeholder="Ex: Jupe satin">
         </div>
-        <div class="field">
-          <label for="category">Categorie</label>
-          <select id="category" name="category" [(ngModel)]="newItem.category">
-            <option>Haut</option>
-            <option>Bas</option>
-            <option>Robe</option>
-            <option>Veste</option>
-            <option>Chaussures</option>
-            <option>Accessoire</option>
-          </select>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="category">Categorie</label>
+            <select id="category" name="category" [(ngModel)]="newItem.category">
+              <option>Haut</option>
+              <option>Bas</option>
+              <option>Robe</option>
+              <option>Veste</option>
+              <option>Chaussures</option>
+              <option>Accessoire</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="season">Saison</label>
+            <select id="season" name="season" [(ngModel)]="newItem.season">
+              <option>Toutes saisons</option>
+              <option>Printemps</option>
+              <option>Ete</option>
+              <option>Automne</option>
+              <option>Hiver</option>
+            </select>
+          </div>
         </div>
-        <div class="field">
+
+        <div class="field color-field">
           <label for="color">Couleur</label>
-          <input id="color" name="color" [(ngModel)]="newItem.color" placeholder="Ex: Beige">
+          <div class="color-input">
+            <span [style.background]="colorStyle(newItem.color)"></span>
+            <input id="color" name="color" [(ngModel)]="newItem.color" placeholder="Ex: Beige">
+          </div>
         </div>
-        <div class="field">
-          <label for="season">Saison</label>
-          <select id="season" name="season" [(ngModel)]="newItem.season">
-            <option>Toutes saisons</option>
-            <option>Printemps</option>
-            <option>Ete</option>
-            <option>Automne</option>
-            <option>Hiver</option>
-          </select>
-        </div>
-        <button class="btn" type="submit">Ajouter</button>
+
+        <button class="btn primary" type="submit">
+          <i class="fa-solid fa-plus"></i>
+          Ajouter au dressing
+        </button>
       </form>
     </article>
 
-    <article class="panel">
-      <p class="eyebrow">Consulter et supprimer</p>
-      <h2>{{ items.length }} pieces dans le dressing</h2>
-      <div class="list">
-        @for (item of items; track item.id) {
-          <div class="card dressing-item">
-            <div>
-              <h3>{{ item.name }}</h3>
-              <p class="muted">{{ item.category }} - {{ item.color || 'Couleur non precisee' }} - {{ item.season }}</p>
+    <article class="closet-panel" id="closet">
+      <div class="panel-head">
+        <div>
+          <span class="eyebrow"><i class="fa-solid fa-border-all"></i> Pieces sauvegardees</span>
+          <h2>{{ filteredItems.length }} pieces affichees</h2>
+        </div>
+        <div class="season-pill">
+          <i class="fa-solid fa-calendar-day"></i>
+          Toutes saisons
+        </div>
+      </div>
+
+      <div class="closet-tools" aria-label="Filtres du dressing">
+        <label class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input name="searchTerm" [(ngModel)]="searchTerm" placeholder="Rechercher couleur, saison, piece...">
+        </label>
+
+        <div class="category-tabs">
+          @for (category of categories; track category) {
+            <button
+              type="button"
+              [class.active]="activeCategory === category"
+              (click)="selectCategory(category)"
+            >
+              {{ category }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="item-grid">
+        @for (item of filteredItems; track item.id) {
+          <article class="dressing-card">
+            <div class="item-visual" [style.--swatch]="colorStyle(item.color)">
+              <i class="fa-solid {{ categoryIcon(item.category) }}"></i>
+              <span class="swatch"></span>
             </div>
-            <button class="btn-danger" type="button" (click)="deleteItem(item.id)">Supprimer</button>
-          </div>
+            <div class="item-copy">
+              <span class="item-category">{{ item.category }}</span>
+              <h3>{{ item.name }}</h3>
+              <p>{{ item.color || 'Couleur non precisee' }} - {{ item.season }}</p>
+            </div>
+            <button class="delete-btn" type="button" (click)="deleteItem(item.id)" aria-label="Supprimer cette piece">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </article>
         } @empty {
-          <p class="muted">Le dressing est vide.</p>
+          <div class="empty-state">
+            <i class="fa-solid fa-shirt"></i>
+            <strong>Aucune piece trouvee.</strong>
+            <span>Essaie une autre categorie ou ajoute une nouvelle piece.</span>
+          </div>
         }
       </div>
     </article>

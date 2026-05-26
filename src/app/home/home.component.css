@@ -26,7 +26,7 @@
 }
 
 .look-board {
-  background-color: #F6B0B0;
+  background-color: #E3B6AE;
   background: var(--bg-card);
   border: 1px solid var(--border-soft);
   border-radius: 8px;
@@ -57,7 +57,7 @@
 
 .note {
   align-self: end;
-  background-color: #F4EAE0;
+  background-color: #EAD8D3;
   background: var(--bg-main);
   border: 1px solid var(--border-soft);
   border-radius: 8px;

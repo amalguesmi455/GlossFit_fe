@@ -1,38 +1,74 @@
-<main class="page">
-  <section class="shell grid two">
-    <article class="panel profile-card">
-      <p class="eyebrow">Profil styliste</p>
-      <h1>{{ profile.name }}</h1>
-      <p class="lead">{{ profile.bio }}</p>
-      <div class="tag-row">
-        <span class="tag">{{ profile.specialty }}</span>
-        <span class="tag">{{ profile.city }}</span>
-        <span class="tag">{{ profile.price }}</span>
-        <span class="tag">{{ profile.availability }}</span>
+<main class="profile-page">
+  <section class="profile-layout">
+    <article class="profile-identity">
+      <div class="profile-card stylist">
+        <div class="profile-top">
+          <span class="eyebrow"><i class="fa-solid fa-user-tie"></i> Profil styliste</span>
+          <span class="status-pill"><i class="fa-solid fa-calendar-check"></i> Disponible</span>
+        </div>
+
+        <div class="avatar-frame">
+          <span>{{ profile.name.charAt(0) }}</span>
+        </div>
+
+        <h1>{{ profile.name }}</h1>
+        <p>{{ profile.bio }}</p>
+
+        <div class="profile-stats" aria-label="Resume styliste">
+          <div>
+            <strong>{{ profile.price }}</strong>
+            <span>Tarif</span>
+          </div>
+          <div>
+            <strong>18</strong>
+            <span>Briefs</span>
+          </div>
+          <div>
+            <strong>4.9</strong>
+            <span>Note</span>
+          </div>
+        </div>
       </div>
-      <div class="actions profile-actions">
-        <a class="btn" routerLink="/demand">Voir les demandes</a>
-        <a class="btn-ghost" routerLink="/dressing">Consulter dressing</a>
+
+      <div class="mini-board" aria-label="Fiche styliste">
+        <div class="board-head">
+          <span><i class="fa-solid fa-scissors"></i> Signature style</span>
+          <small>{{ profile.city }}</small>
+        </div>
+        <div class="tag-row">
+          <span>{{ profile.specialty }}</span>
+          <span>{{ profile.city }}</span>
+          <span>{{ profile.price }}</span>
+          <span>{{ profile.availability }}</span>
+        </div>
+        <div class="actions profile-actions">
+          <a class="btn primary" routerLink="/demand"><i class="fa-solid fa-inbox"></i> Voir les demandes</a>
+          <a class="btn soft" routerLink="/dressing"><i class="fa-solid fa-shirt"></i> Consulter dressing</a>
+        </div>
       </div>
     </article>
 
-    <article class="panel">
-      <p class="eyebrow">CRUD profil</p>
-      <h2>Modifier la fiche styliste</h2>
-      <form class="form" (ngSubmit)="save()">
+    <article class="edit-panel">
+      <span class="eyebrow"><i class="fa-solid fa-pen-to-square"></i> Modifier fiche</span>
+      <h2>Mettre a jour la fiche styliste</h2>
+      <p class="panel-intro">Une fiche claire aide les clientes a comprendre ton univers avant le brief.</p>
+
+      <form class="form profile-form" (ngSubmit)="save()">
         <div class="field">
           <label for="name">Nom</label>
           <input id="name" name="name" [(ngModel)]="draft.name">
         </div>
-        <div class="field">
-          <label for="specialty">Specialite</label>
-          <input id="specialty" name="specialty" [(ngModel)]="draft.specialty">
+        <div class="form-grid">
+          <div class="field">
+            <label for="specialty">Specialite</label>
+            <input id="specialty" name="specialty" [(ngModel)]="draft.specialty">
+          </div>
+          <div class="field">
+            <label for="city">Ville</label>
+            <input id="city" name="city" [(ngModel)]="draft.city">
+          </div>
         </div>
-        <div class="field">
-          <label for="city">Ville</label>
-          <input id="city" name="city" [(ngModel)]="draft.city">
-        </div>
-        <div class="grid two compact-grid">
+        <div class="form-grid">
           <div class="field">
             <label for="price">Tarif</label>
             <input id="price" name="price" [(ngModel)]="draft.price">
@@ -47,12 +83,13 @@
           <textarea id="bio" name="bio" [(ngModel)]="draft.bio"></textarea>
         </div>
         <div class="actions">
-          <button class="btn" type="submit">Enregistrer</button>
-          <button class="btn-ghost" type="button" (click)="reset()">Annuler</button>
+          <button class="btn primary" type="submit"><i class="fa-solid fa-check"></i> Enregistrer</button>
+          <button class="btn soft" type="button" (click)="reset()">Annuler</button>
         </div>
       </form>
+
       @if (saved) {
-        <p class="saved">Fiche styliste mise a jour.</p>
+        <p class="saved"><i class="fa-solid fa-circle-check"></i> Fiche styliste mise a jour.</p>
       }
     </article>
   </section>

@@ -16,9 +16,9 @@ export const routes: Routes = [
         { path:'dressing',component: DressingComponent },
         { path:'demand',component: DemandComponent },
         {path:'home',component: HomeComponent},
-        {path:'profilestyliste/:id',component: ProfilStylisteComponent},
+        {path:'profilestyliste/',component: ProfilStylisteComponent},
         {path:'profilestyliste/:id/dressing',component: DressingComponent},
-        { path: 'profilefashionista/:id', component: ProfilFashionistaComponent },
+        { path: 'profilefashionista', component: ProfilFashionistaComponent },
         { path: 'profilefashionista/:id/dressing', component: DressingComponent },
 
 
