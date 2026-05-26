@@ -1,0 +1,24 @@
+.demand-layout {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+}
+
+.panel h1 {
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: 1;
+}
+
+.demand-form {
+  margin-top: 26px;
+}
+
+.compact-grid {
+  gap: 12px;
+}
+
+@media (max-width: 900px) {
+  .demand-layout {
+    grid-template-columns: 1fr;
+  }
+}

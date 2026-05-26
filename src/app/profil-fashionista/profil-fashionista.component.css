@@ -1,0 +1,25 @@
+.profile-card {
+  align-content: center;
+  min-height: 520px;
+}
+
+.profile-card h1 {
+  font-size: clamp(40px, 6vw, 76px);
+}
+
+.profile-actions {
+  margin-top: 26px;
+}
+
+.compact-grid {
+  gap: 12px;
+}
+
+.saved {
+  background-color: #F4EAE0;
+  background: var(--bg-main);
+  border: 1px solid var(--border-soft);
+  border-radius: 8px;
+  color: var(--text-muted);
+  padding: 12px;
+}

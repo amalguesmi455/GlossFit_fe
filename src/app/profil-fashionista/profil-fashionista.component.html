@@ -1,0 +1,59 @@
+<main class="page">
+  <section class="shell grid two">
+    <article class="panel profile-card">
+      <p class="eyebrow">Profil fashionista</p>
+      <h1>{{ profile.name }}</h1>
+      <p class="lead">{{ profile.bio }}</p>
+      <div class="tag-row">
+        <span class="tag">{{ profile.city }}</span>
+        <span class="tag">{{ profile.style }}</span>
+        <span class="tag">Taille {{ profile.size }}</span>
+        <span class="tag">Budget {{ profile.budget }}</span>
+      </div>
+      <div class="actions profile-actions">
+        <a class="btn" routerLink="/demand">Demander un style</a>
+        <a class="btn-ghost" routerLink="/dressing">Voir dressing</a>
+      </div>
+    </article>
+
+    <article class="panel">
+      <p class="eyebrow">CRUD profil</p>
+      <h2>Modifier les informations</h2>
+      <form class="form" (ngSubmit)="save()">
+        <div class="field">
+          <label for="name">Nom</label>
+          <input id="name" name="name" [(ngModel)]="draft.name">
+        </div>
+        <div class="field">
+          <label for="city">Ville</label>
+          <input id="city" name="city" [(ngModel)]="draft.city">
+        </div>
+        <div class="field">
+          <label for="style">Style prefere</label>
+          <input id="style" name="style" [(ngModel)]="draft.style">
+        </div>
+        <div class="grid two compact-grid">
+          <div class="field">
+            <label for="size">Taille</label>
+            <input id="size" name="size" [(ngModel)]="draft.size">
+          </div>
+          <div class="field">
+            <label for="budget">Budget</label>
+            <input id="budget" name="budget" [(ngModel)]="draft.budget">
+          </div>
+        </div>
+        <div class="field">
+          <label for="bio">Bio</label>
+          <textarea id="bio" name="bio" [(ngModel)]="draft.bio"></textarea>
+        </div>
+        <div class="actions">
+          <button class="btn" type="submit">Enregistrer</button>
+          <button class="btn-ghost" type="button" (click)="reset()">Annuler</button>
+        </div>
+      </form>
+      @if (saved) {
+        <p class="saved">Profil mis a jour.</p>
+      }
+    </article>
+  </section>
+</main>

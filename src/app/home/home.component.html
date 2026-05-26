@@ -1,0 +1,35 @@
+<main class="page home-page">
+  <section class="shell hero">
+    <div class="hero-copy">
+      <p class="eyebrow">Plateforme style sur mesure</p>
+      <h1>Glossfit</h1>
+      <p class="lead">
+        Organise ton dressing, precise ton besoin et collabore avec un styliste pour composer
+        des looks coherents avec ton quotidien.
+      </p>
+      <div class="actions">
+        <a class="btn" routerLink="/signup">Commencer</a>
+        <a class="btn-ghost" routerLink="/demand">Faire une demande</a>
+      </div>
+    </div>
+
+    <div class="look-board" aria-label="Apercu style">
+      <div class="fabric tall"></div>
+      <div class="fabric mid"></div>
+      <div class="fabric small"></div>
+      <div class="note">
+        <strong>Look capsule</strong>
+        <span>minimal, chic, adaptable</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell grid three">
+    @for (service of services; track service) {
+      <article class="card">
+        <h3>{{ service }}</h3>
+        <p class="muted">Une interface simple pour consulter, ajouter, modifier et supprimer les informations utiles.</p>
+      </article>
+    }
+  </section>
+</main>

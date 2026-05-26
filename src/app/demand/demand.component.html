@@ -1,0 +1,68 @@
+<main class="page">
+  <section class="shell demand-layout">
+    <article class="panel">
+      <p class="eyebrow">Demande fashionista</p>
+      <h1>Fabriquer mon style</h1>
+      <p class="lead">
+        Envoie au styliste un brief clair avec l'occasion, le budget, la morphologie et les
+        contraintes importantes.
+      </p>
+
+      <form class="form demand-form" (ngSubmit)="submitDemand()">
+        <div class="field">
+          <label for="occasion">Occasion</label>
+          <input id="occasion" name="occasion" [(ngModel)]="demand.occasion" placeholder="Mariage, entretien, voyage..." required>
+        </div>
+        <div class="grid two compact-grid">
+          <div class="field">
+            <label for="deadline">Date souhaitee</label>
+            <input id="deadline" name="deadline" type="date" [(ngModel)]="demand.deadline">
+          </div>
+          <div class="field">
+            <label for="budget">Budget</label>
+            <input id="budget" name="budget" [(ngModel)]="demand.budget" placeholder="Ex: 150 EUR">
+          </div>
+        </div>
+        <div class="field">
+          <label for="morphology">Morphologie et tailles</label>
+          <textarea id="morphology" name="morphology" [(ngModel)]="demand.morphology"></textarea>
+        </div>
+        <div class="grid two compact-grid">
+          <div class="field">
+            <label for="colors">Couleurs preferees</label>
+            <input id="colors" name="colors" [(ngModel)]="demand.colors">
+          </div>
+          <div class="field">
+            <label for="avoid">A eviter</label>
+            <input id="avoid" name="avoid" [(ngModel)]="demand.avoid">
+          </div>
+        </div>
+        <div class="field">
+          <label for="notes">Infos precises pour le styliste</label>
+          <textarea id="notes" name="notes" [(ngModel)]="demand.notes" placeholder="Pieces deja disponibles, style voulu, niveau de confort..."></textarea>
+        </div>
+        <button class="btn" type="submit">Envoyer la demande</button>
+      </form>
+    </article>
+
+    <aside class="panel">
+      <p class="eyebrow">Demandes envoyees</p>
+      <h2>Historique</h2>
+      <div class="list">
+        @for (request of sentDemands; track request.occasion + request.deadline) {
+          <article class="card">
+            <h3>{{ request.occasion }}</h3>
+            <p class="muted">Budget: {{ request.budget || 'non precise' }}</p>
+            <p class="muted">Date: {{ request.deadline || 'a definir' }}</p>
+            <div class="tag-row">
+              <span class="tag">{{ request.colors || 'Couleurs libres' }}</span>
+              <span class="tag">{{ request.avoid || 'Aucune contrainte' }}</span>
+            </div>
+          </article>
+        } @empty {
+          <p class="muted">Aucune demande envoyee pour le moment.</p>
+        }
+      </div>
+    </aside>
+  </section>
+</main>

@@ -1,0 +1,178 @@
+<nav class="navbar" [class.scrolled]="isScrolled">
+  <div class="nav-container">
+    <div class="nav-content">
+      <a class="logo" routerLink="/" (click)="closeMobileMenu()">
+        <span class="logo-mark">G</span>
+        <span class="logo-text">GlossFit</span>
+      </a>
+
+      <div class="nav-right">
+        <div class="nav-menu">
+          <button class="nav-link" [class.active]="activeSection === 'features'" type="button" (click)="goToSection('features')">Fonctionnalites</button>
+          <button class="nav-link" [class.active]="activeSection === 'about'" type="button" (click)="goToSection('about')">A propos</button>
+          <button class="nav-link" [class.active]="activeSection === 'pricing'" type="button" (click)="goToSection('pricing')">Tarifs</button>
+          <button class="nav-link" [class.active]="activeSection === 'contact'" type="button" (click)="goToSection('contact')">Contact</button>
+        </div>
+
+        <div class="nav-actions">
+          <button
+            class="icon-btn lang-btn"
+            type="button"
+            (click)="toggleLanguage()"
+            [attr.aria-label]="language === 'fr' ? 'Switch to English' : 'Passer en francais'"
+            [attr.title]="language === 'fr' ? 'Switch to English' : 'Passer en francais'"
+          >
+            <i class="fa-solid fa-language lang-icon"></i>
+            <span class="lang-code">{{ language === 'fr' ? 'FR' : 'EN' }}</span>
+          </button>
+
+          @if (!isLoggedIn) {
+            <button class="btn btn-text" type="button" (click)="openAuthModal('signin')">Login</button>
+            <button class="btn btn-primary" type="button" (click)="openAuthModal('signup')">Creer un compte</button>
+          } @else {
+            <a class="nav-link dashboard-link" routerLink="/home">Dashboard</a>
+
+            <button class="icon-btn" type="button" aria-label="Notifications" title="Notifications">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              <span class="notification-badge">3</span>
+            </button>
+
+            <div class="profile-menu-wrapper">
+              <button class="user-avatar-btn" type="button" (click)="toggleProfileMenu()">
+                <span class="user-avatar">{{ user.avatar }}</span>
+                <span class="user-name">{{ user.name }}</span>
+                <svg class="chevron" [class.open]="isProfileMenuOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+
+              <div class="dropdown-menu" [class.open]="isProfileMenuOpen">
+                <div class="dropdown-header">
+                  <span class="dropdown-name">{{ user.name }}</span>
+                  <span class="dropdown-role">Fashionista</span>
+                </div>
+                <a class="dropdown-item" routerLink="/profilefashionista/1" (click)="closeMobileMenu()">Mon profil</a>
+                <a class="dropdown-item" routerLink="/profilestyliste/1" (click)="closeMobileMenu()">Parametres</a>
+                <div class="dropdown-divider"></div>
+                <button class="dropdown-item logout" type="button" (click)="logout()">Deconnexion</button>
+              </div>
+            </div>
+
+            <button class="btn btn-text logout-btn" type="button" (click)="logout()">Logout</button>
+          }
+        </div>
+
+        <button class="mobile-menu-btn" type="button" aria-label="Menu" (click)="toggleMobileMenu()">
+          <span class="hamburger" [class.open]="isMobileMenuOpen"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-menu" [class.open]="isMobileMenuOpen">
+      <button class="mobile-language" type="button" (click)="toggleLanguage()">
+        <i class="fa-solid fa-language lang-icon"></i>
+        <span>{{ language === 'fr' ? 'Francais' : 'English' }}</span>
+      </button>
+
+      <button class="mobile-link" type="button" (click)="goToSection('features')">Fonctionnalites</button>
+      <button class="mobile-link" type="button" (click)="goToSection('about')">A propos</button>
+      <button class="mobile-link" type="button" (click)="goToSection('pricing')">Tarifs</button>
+      <button class="mobile-link" type="button" (click)="goToSection('contact')">Contact</button>
+
+      @if (!isLoggedIn) {
+        <button class="btn btn-text mobile-btn" type="button" (click)="openAuthModal('signin')">Login</button>
+        <button class="btn btn-primary mobile-btn" type="button" (click)="openAuthModal('signup')">Creer un compte</button>
+      } @else {
+        <div class="mobile-user-info">
+          <span class="user-avatar">{{ user.avatar }}</span>
+          <div>
+            <span class="mobile-user-name">{{ user.name }}</span>
+            <span class="mobile-user-role">Fashionista</span>
+          </div>
+        </div>
+        <a class="mobile-link" routerLink="/home" (click)="closeMobileMenu()">Dashboard</a>
+        <a class="mobile-link" routerLink="/profilefashionista/1" (click)="closeMobileMenu()">Mon profil</a>
+        <a class="mobile-link" routerLink="/profilestyliste/1" (click)="closeMobileMenu()">Parametres</a>
+        <button class="btn btn-logout-mobile" type="button" (click)="logout()">Deconnexion</button>
+      }
+    </div>
+  </div>
+</nav>
+
+@if (authModal) {
+  <section class="auth-modal-backdrop" aria-modal="true" role="dialog" [attr.aria-label]="authModal === 'signin' ? 'Connexion' : 'Inscription'" (click)="closeAuthModal()">
+    <div class="auth-modal" (click)="$event.stopPropagation()">
+      <button class="modal-close" type="button" aria-label="Fermer" (click)="closeAuthModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="auth-visual">
+        <span class="modal-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> GlossFit AI</span>
+        <h2>{{ authModal === 'signin' ? 'Bon retour dans ton dressing.' : 'Cree ton espace style.' }}</h2>
+        <p>
+          {{ authModal === 'signin'
+            ? 'Retrouve tes looks, tes pieces et tes demandes stylistes en quelques secondes.'
+            : 'Organise ta garde-robe, recois des tenues adaptees et suis ton evolution mode.' }}
+        </p>
+        <div class="modal-proof">
+          <span><strong>48</strong> pieces</span>
+          <span><strong>12</strong> looks</span>
+          <span><strong>IA</strong> daily</span>
+        </div>
+      </div>
+
+      <div class="auth-form-panel">
+        <div class="auth-tabs" aria-label="Authentification">
+          <button type="button" [class.active]="authModal === 'signin'" (click)="switchAuthModal('signin')">Connexion</button>
+          <button type="button" [class.active]="authModal === 'signup'" (click)="switchAuthModal('signup')">Inscription</button>
+        </div>
+
+        @if (authModal === 'signin') {
+          <form class="modal-form" (ngSubmit)="signin()">
+            <label>
+              Email
+              <input name="signinEmail" type="email" [(ngModel)]="signinForm.email" required placeholder="amal@email.com">
+            </label>
+            <label>
+              Mot de passe
+              <input name="signinPassword" type="password" [(ngModel)]="signinForm.password" required placeholder="Votre mot de passe">
+            </label>
+            <button class="btn btn-primary modal-submit" type="submit">Se connecter</button>
+          </form>
+          <p class="modal-switch">Pas encore de compte ?
+            <button type="button" (click)="switchAuthModal('signup')">Creer un compte</button>
+          </p>
+        } @else {
+          <form class="modal-form" (ngSubmit)="signup()">
+            <label>
+              Nom complet
+              <input name="signupName" [(ngModel)]="signupForm.name" required placeholder="Amal Guesmi">
+            </label>
+            <label>
+              Email
+              <input name="signupEmail" type="email" [(ngModel)]="signupForm.email" required placeholder="amal@email.com">
+            </label>
+            <label>
+              Role
+              <select name="signupRole" [(ngModel)]="signupForm.role">
+                <option value="fashionista">Fashionista</option>
+                <option value="styliste">Styliste</option>
+              </select>
+            </label>
+            <label>
+              Mot de passe
+              <input name="signupPassword" type="password" [(ngModel)]="signupForm.password" required placeholder="Cree un mot de passe">
+            </label>
+            <button class="btn btn-primary modal-submit" type="submit">Creer le compte</button>
+          </form>
+          <p class="modal-switch">Deja inscrit ?
+            <button type="button" (click)="switchAuthModal('signin')">Se connecter</button>
+          </p>
+        }
+      </div>
+    </div>
+  </section>
+}

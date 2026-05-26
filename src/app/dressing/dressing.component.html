@@ -1,0 +1,58 @@
+<main class="page">
+  <section class="shell dressing-layout">
+    <article class="panel">
+      <p class="eyebrow">Dressing CRUD</p>
+      <h1>Ajouter une piece</h1>
+      <form class="form" (ngSubmit)="addItem()">
+        <div class="field">
+          <label for="item-name">Nom de la piece</label>
+          <input id="item-name" name="name" [(ngModel)]="newItem.name" placeholder="Ex: Jupe satin">
+        </div>
+        <div class="field">
+          <label for="category">Categorie</label>
+          <select id="category" name="category" [(ngModel)]="newItem.category">
+            <option>Haut</option>
+            <option>Bas</option>
+            <option>Robe</option>
+            <option>Veste</option>
+            <option>Chaussures</option>
+            <option>Accessoire</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="color">Couleur</label>
+          <input id="color" name="color" [(ngModel)]="newItem.color" placeholder="Ex: Beige">
+        </div>
+        <div class="field">
+          <label for="season">Saison</label>
+          <select id="season" name="season" [(ngModel)]="newItem.season">
+            <option>Toutes saisons</option>
+            <option>Printemps</option>
+            <option>Ete</option>
+            <option>Automne</option>
+            <option>Hiver</option>
+          </select>
+        </div>
+        <button class="btn" type="submit">Ajouter</button>
+      </form>
+    </article>
+
+    <article class="panel">
+      <p class="eyebrow">Consulter et supprimer</p>
+      <h2>{{ items.length }} pieces dans le dressing</h2>
+      <div class="list">
+        @for (item of items; track item.id) {
+          <div class="card dressing-item">
+            <div>
+              <h3>{{ item.name }}</h3>
+              <p class="muted">{{ item.category }} - {{ item.color || 'Couleur non precisee' }} - {{ item.season }}</p>
+            </div>
+            <button class="btn-danger" type="button" (click)="deleteItem(item.id)">Supprimer</button>
+          </div>
+        } @empty {
+          <p class="muted">Le dressing est vide.</p>
+        }
+      </div>
+    </article>
+  </section>
+</main>

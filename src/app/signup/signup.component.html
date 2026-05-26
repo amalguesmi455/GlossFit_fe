@@ -1,0 +1,36 @@
+<main class="page auth-page">
+  <section class="auth-card">
+    <p class="eyebrow">Inscription</p>
+    <h1>Sign up</h1>
+    <p class="lead">Cree un profil fashionista ou styliste pour commencer a organiser tes looks.</p>
+
+    <form class="form" (ngSubmit)="signup()">
+      <div class="field">
+        <label for="name">Nom complet</label>
+        <input id="name" name="name" [(ngModel)]="account.name" required>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" [(ngModel)]="account.email" required>
+      </div>
+      <div class="field">
+        <label for="role">Role</label>
+        <select id="role" name="role" [(ngModel)]="account.role">
+          <option value="fashionista">Fashionista</option>
+          <option value="styliste">Styliste</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="password">Mot de passe</label>
+        <input id="password" name="password" type="password" [(ngModel)]="account.password" required>
+      </div>
+      <button class="btn" type="submit">Creer le compte</button>
+    </form>
+
+    @if (message) {
+      <p class="status">{{ message }}</p>
+    }
+
+    <p class="muted auth-link">Deja inscrit ? <a routerLink="/signin">Se connecter</a></p>
+  </section>
+</main>
