@@ -1,83 +1,179 @@
 <main class="dressing-page">
 
-
   <section class="dressing-workspace">
     <article class="add-panel" id="add-piece">
-      <span class="eyebrow"><i class="fa-solid fa-camera-retro"></i> Nouvelle piece</span>
-      <h2>Ajouter une piece</h2>
-      <p class="panel-intro">Plus les infos sont propres, plus les suggestions de look seront utiles.</p>
+      <span class="eyebrow">
+        <i class="fa-solid fa-camera-retro"></i>
+        {{ editingItemId === null ? 'Nouvelle pièce' : 'Modifier la pièce' }}
+      </span>
+      <h2>{{ editingItemId === null ? 'Ajouter une pièce' : 'Modifier la pièce' }}</h2>
+      @if (message) {
+        <p class="panel-message">{{ message }}</p>
+      }
 
-      <form class="form dressing-form" (ngSubmit)="addItem()">
+      <form class="form dressing-form" (ngSubmit)="submitItem()">
         <div class="field">
-          <label for="item-name">Nom de la piece</label>
-          <input id="item-name" name="name" [(ngModel)]="newItem.name" placeholder="Ex: Jupe satin">
+          <label for="description">Description</label>
+          <input
+            id="description"
+            name="description"
+            [(ngModel)]="formData.description"
+            placeholder="Ex: Veste légère en lin"
+            required
+          >
         </div>
 
         <div class="form-grid">
           <div class="field">
-            <label for="category">Categorie</label>
-            <select id="category" name="category" [(ngModel)]="newItem.category">
-              <option>Haut</option>
-              <option>Bas</option>
-              <option>Robe</option>
-              <option>Veste</option>
-              <option>Chaussures</option>
-              <option>Accessoire</option>
+            <label for="category">Catégorie</label>
+            <select id="category" name="category" [(ngModel)]="formData.category" required>
+              @for (option of categoryOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
             </select>
           </div>
+
+          <div class="field">
+            <label for="brand">Marque</label>
+            <input
+              id="brand"
+              name="brand"
+              [(ngModel)]="formData.brand"
+              placeholder="Ex: Zara"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="style">Style</label>
+            <select id="style" name="style" [(ngModel)]="formData.style" required>
+              @for (option of styleOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="size">Taille</label>
+            <select id="size" name="size" [(ngModel)]="formData.size" required>
+              @for (option of sizeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="occasion">Occasion</label>
+            <select id="occasion" name="occasion" [(ngModel)]="formData.occasion" required>
+              @for (option of occasionOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
           <div class="field">
             <label for="season">Saison</label>
-            <select id="season" name="season" [(ngModel)]="newItem.season">
-              <option>Toutes saisons</option>
-              <option>Printemps</option>
-              <option>Ete</option>
-              <option>Automne</option>
-              <option>Hiver</option>
+            <select id="season" name="season" [(ngModel)]="formData.season" required>
+              @for (option of seasonOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
             </select>
           </div>
         </div>
 
-        <div class="field color-field">
-          <label for="color">Couleur</label>
-          <div class="color-input">
-            <span [style.background]="colorStyle(newItem.color)"></span>
-            <input id="color" name="color" [(ngModel)]="newItem.color" placeholder="Ex: Beige">
+        <div class="form-grid">
+          <div class="field">
+            <label for="material">Matière</label>
+            <select id="material" name="material" [(ngModel)]="formData.material" required>
+              @for (option of materialOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="subCategory">Sous-catégorie</label>
+            <select
+              id="subCategory"
+              name="subCategory"
+              [(ngModel)]="formData.subCategory"
+              required
+            >
+              @for (option of subCategoryOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
           </div>
         </div>
 
-        <button class="btn primary" type="submit">
-          <i class="fa-solid fa-plus"></i>
-          Ajouter au dressing
-        </button>
+        <div class="field">
+          <label for="image">Photo de la pièce</label>
+          <input
+            #imageInput
+            id="image"
+            name="image"
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+          >
+        </div>
+
+        @if (imagePreview) {
+          <div class="image-preview">
+            <img [src]="imagePreview" alt="Prévisualisation de la pièce">
+          </div>
+        }
+
+        <div class="form-actions">
+          @if (editingItemId !== null) {
+            <button class="btn soft" type="button" (click)="cancelEdit()">
+              <i class="fa-solid fa-xmark"></i>
+              Annuler
+            </button>
+          }
+
+          <button class="btn primary" type="submit" [disabled]="isLoading">
+            <i class="fa-solid fa-plus"></i>
+            {{ editingItemId === null ? 'Ajouter au dressing' : 'Mettre à jour' }}
+          </button>
+        </div>
       </form>
     </article>
 
     <article class="closet-panel" id="closet">
       <div class="panel-head">
         <div>
-          <span class="eyebrow"><i class="fa-solid fa-border-all"></i> Pieces sauvegardees</span>
-          <h2>{{ filteredItems.length }} pieces affichees</h2>
+          <span class="eyebrow"><i class="fa-solid fa-border-all"></i> Pièces sauvegardées</span>
+          <h2>{{ filteredItems.length }} pièces affichées</h2>
         </div>
-        <div class="season-pill">
-          <i class="fa-solid fa-calendar-day"></i>
-          Toutes saisons
-        </div>
+        <button type="button" class="season-pill" (click)="loadWardrobe()">
+          <i class="fa-solid fa-rotate"></i>
+          Rafraîchir
+        </button>
       </div>
 
       <div class="closet-tools" aria-label="Filtres du dressing">
         <label class="search-box">
           <i class="fa-solid fa-magnifying-glass"></i>
-          <input name="searchTerm" [(ngModel)]="searchTerm" placeholder="Rechercher couleur, saison, piece...">
+          <input
+            name="searchTerm"
+            [(ngModel)]="searchTerm"
+            placeholder="Rechercher description, marque, matière..."
+          >
         </label>
 
         <div class="category-tabs">
-          @for (category of categories; track category) {
+          @for (category of categoryOptions; track category.value) {
             <button
               type="button"
-              [class.active]="activeCategory === category"
-              (click)="selectCategory(category)"
+              [class.active]="activeCategory === category.value"
+              (click)="selectCategory(category.value)"
             >
-              {{ category }}
+              {{ category.label }}
             </button>
           }
         </div>
@@ -86,24 +182,49 @@
       <div class="item-grid">
         @for (item of filteredItems; track item.id) {
           <article class="dressing-card">
-            <div class="item-visual" [style.--swatch]="colorStyle(item.color)">
-              <i class="fa-solid {{ categoryIcon(item.category) }}"></i>
-              <span class="swatch"></span>
+            <div class="item-visual" [style.--swatch]="categorySwatch(item.category)">
+              @if (item.image) {
+                <img class="item-image" [src]="imageSrc(item.image)" [alt]="item.description">
+              } @else {
+                <i class="fa-solid {{ categoryIcon(item.category) }}"></i>
+                <span class="swatch"></span>
+              }
             </div>
+
             <div class="item-copy">
-              <span class="item-category">{{ item.category }}</span>
-              <h3>{{ item.name }}</h3>
-              <p>{{ item.color || 'Couleur non precisee' }} - {{ item.season }}</p>
+              <span class="item-category">{{ categoryLabel(item.category) }}</span>
+              <h3>{{ item.description }}</h3>
+              <p>{{ item.brand }} · {{ styleLabel(item.style) }}</p>
+              <p>{{ sizeLabel(item.size) }} · {{ occasionLabel(item.occasion) }}</p>
+              <p>{{ seasonLabel(item.season) }} · {{ materialLabel(item.material) }}</p>
+              <p>{{ subCategoryLabel(item.subCategory) }}</p>
             </div>
-            <button class="delete-btn" type="button" (click)="deleteItem(item.id)" aria-label="Supprimer cette piece">
-              <i class="fa-solid fa-trash"></i>
-            </button>
+
+            <div class="card-actions">
+              <button
+                class="delete-btn"
+                type="button"
+                (click)="editItem(item)"
+                aria-label="Modifier cette pièce"
+              >
+                <i class="fa-solid fa-pen"></i>
+              </button>
+
+              <button
+                class="delete-btn"
+                type="button"
+                (click)="deleteItem(item.id)"
+                aria-label="Supprimer cette pièce"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
           </article>
         } @empty {
           <div class="empty-state">
             <i class="fa-solid fa-shirt"></i>
-            <strong>Aucune piece trouvee.</strong>
-            <span>Essaie une autre categorie ou ajoute une nouvelle piece.</span>
+            <strong>Aucune pièce trouvée.</strong>
+            <span>Ajoute une pièce ou ajuste tes filtres pour voir le dressing.</span>
           </div>
         }
       </div>
