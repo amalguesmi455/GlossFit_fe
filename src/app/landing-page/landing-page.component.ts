@@ -1,12 +1,10 @@
 import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-landing-page',
+  imports: [RouterLink],
   templateUrl: './landing-page.component.html',
   styleUrl: './landing-page.component.css'
 })
-export class LandingPageComponent {
-  openAuthModal(mode: 'signin' | 'signup' = 'signup'): void {
-    window.dispatchEvent(new CustomEvent('glossfit-auth', { detail: mode }));
-  }
-}
+export class LandingPageComponent {}

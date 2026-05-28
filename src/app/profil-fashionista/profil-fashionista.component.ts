@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -13,7 +14,7 @@ interface FashionistaProfile {
 
 @Component({
   selector: 'app-profil-fashionista',
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './profil-fashionista.component.html',
   styleUrl: './profil-fashionista.component.css'
 })

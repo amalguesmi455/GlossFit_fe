@@ -88,9 +88,7 @@
         </div>
       </form>
 
-      @if (saved) {
-        <p class="saved"><i class="fa-solid fa-circle-check"></i> Profil mis a jour.</p>
-      }
+      <p class="saved" *ngIf="saved"><i class="fa-solid fa-circle-check"></i> Profil mis a jour.</p>
     </article>
   </section>
 </main>

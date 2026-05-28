@@ -1,36 +1,79 @@
-<main class="page auth-page">
-  <section class="auth-card">
-    <p class="eyebrow">Inscription</p>
-    <h1>Sign up</h1>
-    <p class="lead">Cree un profil fashionista ou styliste pour commencer a organiser tes looks.</p>
+<main class="page auth-page signup-page">
+  <header class="auth-topbar">
+    <a class="brand-link" routerLink="/"><span>G</span>GlossFit</a>
+    <a class="topbar-link" routerLink="/signin">Déjà inscrit ? <strong>Se connecter →</strong></a>
+  </header>
 
-    <form class="form" (ngSubmit)="signup()">
-      <div class="field">
-        <label for="name">Nom complet</label>
-        <input id="name" name="name" [(ngModel)]="account.name" required>
-      </div>
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" [(ngModel)]="account.email" required>
-      </div>
-      <div class="field">
-        <label for="role">Role</label>
-        <select id="role" name="role" [(ngModel)]="account.role">
-          <option value="fashionista">Fashionista</option>
-          <option value="styliste">Styliste</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="password">Mot de passe</label>
-        <input id="password" name="password" type="password" [(ngModel)]="account.password" required>
-      </div>
-      <button class="btn" type="submit">Creer le compte</button>
-    </form>
+  <section class="auth-layout">
+    <section class="auth-copy" aria-labelledby="signup-title">
+      <span class="eyebrow"><i class="fa-solid fa-sparkles"></i> Création de compte</span>
+      <h1 id="signup-title">Rejoins GlossFit.</h1>
+      <p class="lead">Crée ton compte en quelques secondes et choisis ton rôle pour une expérience sur mesure.</p>
 
-    @if (message) {
-      <p class="status">{{ message }}</p>
-    }
+      <!-- Role Selector -->
+      <div class="role-selector" role="group" aria-labelledby="role-label">
+        <p class="field-label" id="role-label">Je suis…</p>
+        <div class="role-options">
+          <button
+            type="button"
+            class="role-option"
+            [class.active]="account.role === 'FASHIONISTA'"
+            (click)="setRole('FASHIONISTA')"
+            [attr.aria-pressed]="account.role === 'FASHIONISTA'"
+          >
+            <i class="fa-solid fa-person-dress role-icon"></i>
+            <span class="role-name">Fashionista</span>
+            <span class="role-desc">Gère ton dressing & partage tes demandes de style</span>
+            <span class="role-check" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          </button>
 
-    <p class="muted auth-link">Deja inscrit ? <a routerLink="/signin">Se connecter</a></p>
+          <button
+            type="button"
+            class="role-option"
+            [class.active]="account.role === 'STYLISTE'"
+            (click)="setRole('STYLISTE')"
+            [attr.aria-pressed]="account.role === 'STYLISTE'"
+          >
+            <i class="fa-solid fa-user-tie role-icon"></i>
+            <span class="role-name">Styliste</span>
+            <span class="role-desc">Reçois des briefs clients & propose des looks</span>
+            <span class="role-check" aria-hidden="true"><i class="fa-solid fa-circle-check"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <form class="form" (ngSubmit)="signup()" novalidate>
+        <input type="hidden" name="role" [(ngModel)]="account.role">
+
+        <label class="field" for="name">
+          <span>Nom complet</span>
+          <input id="name" name="name" [(ngModel)]="account.name" required placeholder="Amal Guesmi" autocomplete="name">
+        </label>
+
+        <label class="field" for="email">
+          <span>Adresse email</span>
+          <input id="email" name="email" type="email" [(ngModel)]="account.email" required placeholder="amal@email.com" autocomplete="email">
+        </label>
+
+        <label class="field" for="password">
+          <span>Mot de passe <small class="field-hint">minimum 6 caractères</small></span>
+          <input id="password" name="password" type="password" [(ngModel)]="account.password" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+        </label>
+
+        <button class="btn primary" type="submit" [disabled]="isLoading">
+          <i class="fa-solid fa-user-plus"></i>
+          {{ isLoading ? 'Création en cours…' : 'Créer mon compte' }}
+        </button>
+      </form>
+
+      <p class="status" *ngIf="message" role="alert"><i class="fa-solid fa-circle-info"></i>{{ message }}</p>
+
+      <p class="terms-note">
+        En créant un compte, tu acceptes nos
+        <a href="#">conditions d'utilisation</a> et notre <a href="#">politique de confidentialité</a>.
+      </p>
+
+      <p class="auth-link">Déjà un compte ? <a routerLink="/signin">Se connecter</a></p>
+    </section>
   </section>
 </main>

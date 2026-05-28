@@ -1,38 +1,38 @@
-import { Component, HostListener } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+
+import { AuthService } from '../core/auth/auth.service';
+import { AuthUser, UserRole } from '../core/auth/auth.models';
 
 @Component({
   selector: 'app-navbar',
-  imports: [FormsModule, RouterLink],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css'
 })
-export class NavbarComponent {
-  authModal: 'signin' | 'signup' | null = null;
+export class NavbarComponent implements OnInit {
   isLoggedIn = false;
   isMobileMenuOpen = false;
   isProfileMenuOpen = false;
   isScrolled = false;
   activeSection = 'hero';
   language: 'fr' | 'en' = 'fr';
-  authMessage = '';
-  signinForm = {
-    email: '',
-    password: '',
-  };
-  signupForm = {
-    name: '',
-    email: '',
-    role: 'fashionista',
-    password: '',
-  };
   user = {
     name: 'Amal Guesmi',
     avatar: 'AG',
+    role: 'FASHIONISTA' as UserRole,
+    id: 0,
   };
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe(user => this.applyAuthUser(user));
+  }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
@@ -49,17 +49,6 @@ export class NavbarComponent {
     }
   }
 
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    this.closeAuthModal();
-  }
-
-  @HostListener('window:glossfit-auth', ['$event'])
-  onAuthRequest(event: Event): void {
-    const mode = (event as CustomEvent<'signin' | 'signup'>).detail || 'signup';
-    this.openAuthModal(mode);
-  }
-
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
     this.isProfileMenuOpen = false;
@@ -71,41 +60,6 @@ export class NavbarComponent {
 
   toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
-  }
-
-  openAuthModal(mode: 'signin' | 'signup'): void {
-    this.authModal = mode;
-    this.authMessage = '';
-    this.isMobileMenuOpen = false;
-    this.isProfileMenuOpen = false;
-  }
-
-  closeAuthModal(): void {
-    this.authModal = null;
-    this.authMessage = '';
-  }
-
-  switchAuthModal(mode: 'signin' | 'signup'): void {
-    this.authModal = mode;
-    this.authMessage = '';
-  }
-
-  signin(): void {
-    this.isLoggedIn = true;
-    this.user = {
-      name: this.signinForm.email ? this.signinForm.email.split('@')[0] : 'Amal Guesmi',
-      avatar: this.getInitials(this.signinForm.email || 'Amal Guesmi'),
-    };
-    this.closeAuthModal();
-  }
-
-  signup(): void {
-    this.isLoggedIn = true;
-    this.user = {
-      name: this.signupForm.name || 'Nouveau profil',
-      avatar: this.getInitials(this.signupForm.name || this.signupForm.email || 'Nouveau profil'),
-    };
-    this.closeAuthModal();
   }
 
   toggleLanguage(): void {
@@ -147,9 +101,39 @@ export class NavbarComponent {
   }
 
   logout(): void {
-    this.isLoggedIn = false;
+    this.authService.logout();
     this.isProfileMenuOpen = false;
     this.isMobileMenuOpen = false;
+    void this.router.navigate(['/']);
+  }
+
+  get profileRoute(): string {
+    return this.user.role === 'STYLISTE'
+      ? `/profilestyliste/${this.user.id}`
+      : `/profilefashionista/${this.user.id}`;
+  }
+
+  get settingsRoute(): string {
+    return this.profileRoute;
+  }
+
+  get displayRole(): string {
+    return this.user.role === 'STYLISTE' ? 'Styliste' : 'Fashionista';
+  }
+
+  private applyAuthUser(authUser: AuthUser | null): void {
+    this.isLoggedIn = !!authUser;
+
+    if (!authUser) {
+      return;
+    }
+
+    this.user = {
+      name: authUser.email.split('@')[0] || 'GlossFit',
+      avatar: this.getInitials(authUser.email),
+      role: authUser.role,
+      id: authUser.id,
+    };
   }
 
   private getInitials(value: string): string {

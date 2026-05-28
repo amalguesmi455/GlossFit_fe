@@ -7,19 +7,27 @@ import { ProfilStylisteComponent } from './profil-styliste/profil-styliste.compo
 import { SignupComponent } from './signup/signup.component';
 import { DemandComponent } from './demand/demand.component';
 import { LandingPageComponent } from './landing-page/landing-page.component';
+import { VerifyEmailComponent } from './verify-email/verify-email.component';
+import { CreateProfileFashionistaComponent } from './create-profile-fashionista/create-profile-fashionista.component';
+import { CreateProfileStylisteComponent } from './create-profile-styliste/create-profile-styliste.component';
 
 export const routes: Routes = [
 
         { path: '', component: LandingPageComponent },
         { path: 'signin', component: SigninComponent },
         { path: 'signup', component: SignupComponent },
+        { path: 'verify-email', component: VerifyEmailComponent },
         { path:'dressing',component: DressingComponent },
         { path:'demand',component: DemandComponent },
         {path:'home',component: HomeComponent},
-        {path:'profilestyliste/',component: ProfilStylisteComponent},
+        {path:'profilestyliste',component: ProfilStylisteComponent},
+        {path:'profilestyliste/:id',component: ProfilStylisteComponent},
         {path:'profilestyliste/:id/dressing',component: DressingComponent},
         { path: 'profilefashionista', component: ProfilFashionistaComponent },
-        { path: 'profilefashionista/:id/dressing', component: DressingComponent },
+        { path: 'profilefashionista/:id', component: ProfilFashionistaComponent },
+        { path: 'createprofilefashionista', component: CreateProfileFashionistaComponent },
+        { path: 'createprofileStyliste', component: CreateProfileStylisteComponent },
+        
 
 
 ];

@@ -1,5 +1,6 @@
 
-<app-navbar />
-<main class="app-content">
-  <router-outlet />
+<app-navbar *ngIf="showNavbar"></app-navbar>
+
+<main class="app-content" [class.no-navbar]="!showNavbar">
+  <router-outlet></router-outlet>
 </main>

@@ -1,25 +1,35 @@
-<main class="page auth-page">
-  <section class="auth-card">
-    <p class="eyebrow">Connexion</p>
-    <h1>Sign in</h1>
-    <p class="lead">Retrouve ton dressing, tes demandes et tes collaborations stylistes.</p>
+<main class="page auth-page signin-page">
+  <header class="auth-topbar">
+    <a class="brand-link" routerLink="/"><span>G</span>GlossFit</a>
+  </header>
 
-    <form class="form" (ngSubmit)="signin()">
-      <div class="field">
-        <label for="email">Email</label>
-        <input id="email" name="email" type="email" [(ngModel)]="email" required>
-      </div>
-      <div class="field">
-        <label for="password">Mot de passe</label>
-        <input id="password" name="password" type="password" [(ngModel)]="password" required>
-      </div>
-      <button class="btn" type="submit">Se connecter</button>
-    </form>
+  <section class="auth-layout">
+    <section class="auth-copy" aria-labelledby="signin-title">
+      <span class="eyebrow"><i class="fa-solid fa-door-open"></i> Connexion</span>
+      <h1 id="signin-title">Bienvenue sur GlossFit.</h1>
+      <p class="lead">Connecte-toi pour créer et explorer ton espace style.</p>
 
-    @if (message) {
-      <p class="status">{{ message }}</p>
-    }
+      <form class="form" (ngSubmit)="signin()" novalidate>
+        <label class="field" for="email">
+          <span>Email</span>
+          <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="amal@email.com" autocomplete="email">
+        </label>
 
-    <p class="muted auth-link">Pas encore de compte ? <a routerLink="/signup">Creer un compte</a></p>
+        <label class="field" for="password">
+          <span>Mot de passe</span>
+          <input id="password" name="password" type="password" [(ngModel)]="password" required placeholder="Votre mot de passe" autocomplete="current-password">
+        </label>
+
+        <button class="btn primary" type="submit" [disabled]="isLoading">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          {{ isLoading ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </form>
+
+      <p class="status" *ngIf="message"><i class="fa-solid fa-circle-info"></i>{{ message }}</p>
+
+      <p class="auth-link">Pas encore de compte ? <a routerLink="/signup">Commencer maintenant</a></p>
+    </section>
+
   </section>
 </main>

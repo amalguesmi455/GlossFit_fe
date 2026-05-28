@@ -8,14 +8,14 @@
       </p>
 
       <div class="hero-actions">
-        <button class="btn primary" type="button" (click)="openAuthModal('signup')">
+        <a class="btn primary" routerLink="/signup">
           <i class="fa-solid fa-arrow-right"></i>
           Commencer
-        </button>
-        <button class="btn soft" type="button" (click)="openAuthModal('signup')">
+        </a>
+        <a class="btn soft" routerLink="/signup">
           <i class="fa-regular fa-message"></i>
           Demander un style
-        </button>
+        </a>
       </div>
 
       <div class="trust-row" aria-label="Indicateurs">
@@ -189,7 +189,7 @@
           <li><i class="fa-solid fa-check"></i> Dressing CRUD</li>
           <li><i class="fa-solid fa-check"></i> Demande styliste</li>
         </ul>
-        <button class="btn soft" type="button" (click)="openAuthModal('signup')">Commencer</button>
+        <a class="btn soft" routerLink="/signup">Commencer</a>
       </article>
       <article class="price-card featured-plan">
         <span class="plan-icon"><i class="fa-solid fa-scissors"></i></span>
@@ -201,7 +201,7 @@
           <li><i class="fa-solid fa-check"></i> Contraintes precises</li>
           <li><i class="fa-solid fa-check"></i> Look personnalise</li>
         </ul>
-        <button class="btn primary" type="button" (click)="openAuthModal('signup')">Faire une demande</button>
+        <a class="btn primary" routerLink="/signup">Faire une demande</a>
       </article>
     </div>
   </section>
@@ -213,7 +213,7 @@
       <p>Prepare ton brief et laisse le styliste transformer tes contraintes en style.</p>
     </div>
     <div class="contact-actions">
-      <button class="btn soft" type="button" (click)="openAuthModal('signup')"><i class="fa-solid fa-paper-plane"></i> Faire une demande</button>
+      <a class="btn soft" routerLink="/signup"><i class="fa-solid fa-paper-plane"></i> Faire une demande</a>
       <a class="btn outline" href="mailto:hello@glossfit.com"><i class="fa-regular fa-envelope"></i> hello&#64;glossfit.com</a>
     </div>
   </section>

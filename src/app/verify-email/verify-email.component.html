@@ -1,0 +1,35 @@
+<main class="page auth-page verify-page">
+  <header class="auth-topbar">
+    <a class="brand-link" routerLink="/"><span>G</span>GlossFit</a>
+  </header>
+
+  <section class="auth-layout">
+    <section class="auth-copy" aria-labelledby="verify-title">
+      <span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Vérification email</span>
+      <h1 id="verify-title">{{ isVerified ? 'Compte activé, bienvenue.' : 'Vérification en cours.' }}</h1>
+      <p class="lead">{{ message }}</p>
+
+      <div class="verify-icon" [class.success]="isVerified" aria-hidden="true">
+        <ng-container *ngIf="isLoading; else verifyResult">
+          <div class="loader" aria-label="Vérification en cours"></div>
+        </ng-container>
+        <ng-template #verifyResult>
+          <i *ngIf="isVerified; else verifyFailed" class="fa-solid fa-check"></i>
+          <ng-template #verifyFailed>
+            <i class="fa-solid fa-link-slash"></i>
+          </ng-template>
+        </ng-template>
+      </div>
+
+      <div class="verify-steps">
+        <span class="done"><i class="fa-solid fa-envelope"></i> Email reçu</span>
+        <span [class.done]="isVerified"><i class="fa-solid fa-shield-halved"></i> Compte activé</span>
+        <span><i class="fa-solid fa-arrow-right-to-bracket"></i> Connexion</span>
+      </div>
+
+      <a *ngIf="!isLoading" class="btn primary" routerLink="/signin">
+        <i class="fa-solid fa-arrow-right-to-bracket"></i> Aller à la connexion
+      </a>
+    </section>
+  </section>
+</main>
