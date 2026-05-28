@@ -110,8 +110,11 @@ export class AuthService {
 
     try {
       const user = JSON.parse(rawUser) as AuthUser;
-      user.role = this.normalizeRole(user.role);
-      return user;
+      return {
+        ...user,
+        role: this.normalizeRole(user.role),
+        hasProfile: this.readHasProfile(user),
+      };
     } catch {
       localStorage.removeItem(USER_KEY);
       return null;
@@ -123,8 +126,12 @@ export class AuthService {
       id: response.userId,
       email: response.email,
       role: this.normalizeRole(response.role),
-      hasProfile: response.hasProfile ?? false,
+      hasProfile: this.readHasProfile(response),
     };
+  }
+
+  private readHasProfile(source: Pick<AuthResponse, 'hasProfile' | 'has_profile'> | Pick<AuthUser, 'hasProfile' | 'has_profile'>): boolean {
+    return source.hasProfile ?? source.has_profile ?? false;
   }
 
   private normalizeRole(role: string): UserRole {

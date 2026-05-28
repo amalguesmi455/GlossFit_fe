@@ -9,6 +9,7 @@ export interface AuthResponse {
   email: string;
   role: UserRole | string;
   hasProfile?: boolean;
+  has_profile?: boolean;
 }
 
 export interface SignInRequest {
@@ -27,6 +28,7 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   hasProfile?: boolean;
+  has_profile?: boolean;
   emailVerified?: boolean;
   accountVerified?: boolean;
   active?: boolean;
