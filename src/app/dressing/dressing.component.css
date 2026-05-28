@@ -286,6 +286,18 @@ h2 {
   margin: 12px 0 0;
 }
 
+.panel-message {
+  background: rgba(164, 110, 81, .08);
+  border: 1px solid rgba(164, 110, 81, .16);
+  border-radius: 14px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: 18px 0 0;
+  padding: 12px 14px;
+}
+
 .dressing-form {
   margin-top: 24px;
 }
@@ -360,6 +372,27 @@ h2 {
 .color-input input:focus,
 .search-box input:focus {
   box-shadow: none;
+}
+
+.image-preview {
+  background: rgba(234, 216, 211, .72);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 18px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.image-preview img {
+  display: block;
+  height: 240px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .btn {
@@ -480,7 +513,15 @@ h2 {
   display: flex;
   font-size: 26px;
   justify-content: center;
+  overflow: hidden;
   position: relative;
+}
+
+.item-image {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .swatch {
@@ -542,6 +583,13 @@ h2 {
   background: var(--button-dark);
   color: var(--button-text);
   transform: translateY(-2px);
+}
+
+.card-actions {
+  align-self: start;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .empty-state {
