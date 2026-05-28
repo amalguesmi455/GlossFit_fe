@@ -1,0 +1,295 @@
+/* Inherits all base styles from signin_component.css */
+/* Inherits profile layout styles from create-profile-fashionista.component.css */
+/* Add this component's CSS after importing both shared stylesheets */
+
+/* ── Layout override for two-column profile page ── */
+.profile-layout {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+  max-width: 1080px;
+}
+
+/* ── Steps indicator ── */
+.steps {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+  margin: 0 0 28px;
+  flex-wrap: wrap;
+}
+
+.step {
+  align-items: center;
+  background: rgba(234, 216, 211, .4);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 999px;
+  color: rgba(90, 65, 53, .5);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  gap: 6px;
+  letter-spacing: .06em;
+  padding: 7px 14px;
+  text-transform: uppercase;
+  transition: background .2s, color .2s, border-color .2s;
+}
+
+.step.active {
+  background: var(--button-dark);
+  border-color: var(--button-dark);
+  color: var(--button-text);
+}
+
+.step.done {
+  background: rgba(164, 110, 81, .18);
+  border-color: rgba(164, 110, 81, .3);
+  color: var(--button-dark);
+}
+
+.step-sep {
+  color: rgba(164, 110, 81, .35);
+  font-size: 10px;
+}
+
+/* ── Form step animation ── */
+.form-step {
+  animation: stepIn .22s ease-out both;
+  display: grid;
+  gap: 15px;
+}
+
+@keyframes stepIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Field row ── */
+.field-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* ── Avatar upload ── */
+.avatar-upload {
+  align-items: center;
+  background: rgba(234, 216, 211, .4);
+  border: 2px dashed rgba(164, 110, 81, .3);
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  min-height: 100px;
+  overflow: hidden;
+  transition: border-color .2s, background .2s;
+}
+
+.avatar-upload:hover {
+  background: rgba(234, 216, 211, .6);
+  border-color: var(--button-dark);
+}
+
+.avatar-placeholder {
+  align-items: center;
+  color: rgba(90, 65, 53, .55);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px;
+}
+
+.avatar-placeholder i { font-size: 22px; }
+.avatar-placeholder span { font-size: 13px; font-weight: 700; }
+
+.avatar-preview img {
+  display: block;
+  height: 100px;
+  object-fit: cover;
+  width: 100%;
+}
+
+/* ── Experience slider ── */
+.exp-slider-wrapper {
+  align-items: center;
+  display: flex;
+  gap: 14px;
+}
+
+.exp-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(234, 216, 211, .7);
+  border-radius: 999px;
+  flex: 1;
+  height: 6px;
+  outline: none;
+}
+
+.exp-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--button-dark);
+  border-radius: 50%;
+  cursor: pointer;
+  height: 20px;
+  width: 20px;
+}
+
+.exp-slider::-moz-range-thumb {
+  background: var(--button-dark);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 20px;
+  width: 20px;
+}
+
+.exp-value {
+  background: rgba(164, 110, 81, .15);
+  border: 1px solid rgba(164, 110, 81, .2);
+  border-radius: 6px;
+  color: var(--button-dark);
+  font-size: 13px;
+  font-weight: 900;
+  min-width: 58px;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+/* ── Style / specialty grid ── */
+.style-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.style-btn {
+  align-items: center;
+  background: rgba(234, 216, 211, .4);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 8px;
+  color: rgba(90, 65, 53, .65);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-size: 12px;
+  font-weight: 700;
+  gap: 8px;
+  justify-content: center;
+  min-height: 78px;
+  padding: 12px 8px;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.style-btn i { font-size: 20px; }
+
+.style-btn:hover {
+  background: rgba(164, 110, 81, .14);
+  border-color: rgba(164, 110, 81, .35);
+  color: var(--button-dark);
+}
+
+.style-btn.selected {
+  background: rgba(164, 110, 81, .2);
+  border-color: var(--button-dark);
+  color: var(--button-dark);
+}
+
+/* ── Portfolio input ── */
+.portfolio-input-wrapper {
+  position: relative;
+}
+
+.portfolio-icon {
+  color: rgba(164, 110, 81, .6);
+  left: 14px;
+  pointer-events: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.field input.with-icon {
+  padding-left: 38px;
+}
+
+.field input {
+  background: rgba(234, 216, 211, .58);
+  border: 1px solid rgba(164, 110, 81, .18);
+  border-radius: 8px;
+  color: var(--text-primary);
+  min-height: 50px;
+  outline: none;
+  padding: 12px 14px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.field input:focus {
+  border-color: var(--button-dark);
+  box-shadow: 0 0 0 3px rgba(227, 182, 174, .35);
+}
+
+/* ── Portfolio hint ── */
+.portfolio-hint {
+  align-items: flex-start;
+  background: rgba(164, 110, 81, .07);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 8px;
+  color: rgba(90, 65, 53, .7);
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+  line-height: 1.5;
+  padding: 12px;
+}
+
+.portfolio-hint i {
+  color: var(--button-dark);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── Button row ── */
+.btn-row {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: auto 1fr;
+}
+
+.btn.secondary {
+  background: rgba(234, 216, 211, .6);
+  border: 1px solid rgba(164, 110, 81, .2);
+  color: var(--button-dark);
+}
+
+.btn.secondary:hover {
+  background: rgba(234, 216, 211, .9);
+}
+
+/* required asterisk */
+.field span em {
+  color: #c0503a;
+  font-style: normal;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .profile-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .style-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .btn-row {
+    grid-template-columns: 1fr 1fr;
+  }
+}

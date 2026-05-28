@@ -1,1 +1,187 @@
-<p>create-profile-styliste works!</p>
+<main class="page auth-page create-profile-page">
+  <header class="auth-topbar">
+    <a class="brand-link" routerLink="/"><span>G</span>GlossFit</a>
+    <a class="topbar-link" routerLink="/signin">Déjà membre</a>
+  </header>
+
+  <section class="auth-layout profile-layout">
+    <section class="auth-copy" aria-labelledby="profile-title">
+      <span class="eyebrow"><i class="fa-solid fa-scissors"></i> Styliste</span>
+      <h1 id="profile-title">Ton profil expert.</h1>
+      <p class="lead">Présente ton univers et attire les fashionistas qui te correspondent.</p>
+
+      <!-- Step indicator -->
+      <div class="steps">
+        <span class="step" [class.active]="currentStep === 1" [class.done]="currentStep > 1">
+          <i class="fa-solid fa-user"></i> Identité
+        </span>
+        <span class="step-sep"><i class="fa-solid fa-chevron-right"></i></span>
+        <span class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2">
+          <i class="fa-solid fa-briefcase"></i> Expertise
+        </span>
+        <span class="step-sep"><i class="fa-solid fa-chevron-right"></i></span>
+        <span class="step" [class.active]="currentStep === 3">
+          <i class="fa-solid fa-link"></i> Portfolio
+        </span>
+      </div>
+
+      <form class="form" (ngSubmit)="submit()" novalidate>
+
+        <!-- Step 1: Identity -->
+        <div class="form-step" *ngIf="currentStep === 1">
+          <div class="field-row">
+            <label class="field" for="nom">
+              <span>Nom <em>*</em></span>
+              <input id="nom" name="nom" type="text" [(ngModel)]="formData.nom" required placeholder="Mrad">
+            </label>
+            <label class="field" for="prenom">
+              <span>Prénom <em>*</em></span>
+              <input id="prenom" name="prenom" type="text" [(ngModel)]="formData.prenom" required placeholder="Sarra">
+            </label>
+          </div>
+
+          <label class="field" for="ville">
+            <span>Ville</span>
+            <input id="ville" name="ville" type="text" [(ngModel)]="formData.ville" placeholder="Tunis">
+          </label>
+
+          <label class="field avatar-field" for="profilePicture">
+            <span>Photo de profil</span>
+            <div class="avatar-upload" (click)="fileInput.click()">
+              <div class="avatar-preview" *ngIf="avatarPreview">
+                <img [src]="avatarPreview" alt="Aperçu">
+              </div>
+              <div class="avatar-placeholder" *ngIf="!avatarPreview">
+                <i class="fa-solid fa-camera"></i>
+                <span>Ajouter une photo</span>
+              </div>
+            </div>
+            <input #fileInput id="profilePicture" name="profilePicture" type="file"
+              accept="image/*" (change)="onFileSelected($event)" hidden>
+          </label>
+
+          <button class="btn primary" type="button" (click)="nextStep()" [disabled]="!formData.nom || !formData.prenom">
+            Continuer <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Step 2: Expertise -->
+        <div class="form-step" *ngIf="currentStep === 2">
+          <label class="field" for="experienceYears">
+            <span>Années d'expérience</span>
+            <div class="exp-slider-wrapper">
+              <input id="experienceYears" name="experienceYears" type="range"
+                [(ngModel)]="formData.experienceYears" min="0" max="30" step="1"
+                class="exp-slider">
+              <span class="exp-value">{{ formData.experienceYears }} ans</span>
+            </div>
+          </label>
+
+          <label class="field" for="stylistSpecialty">
+            <span>Spécialité</span>
+            <div class="style-grid">
+              <button type="button" class="style-btn"
+                *ngFor="let s of specialties"
+                [class.selected]="formData.stylistSpecialty === s.value"
+                (click)="formData.stylistSpecialty = s.value">
+                <i [class]="s.icon"></i>
+                <span>{{ s.label }}</span>
+              </button>
+            </div>
+          </label>
+
+          <label class="field" for="style">
+            <span>Style que vous maîtrisez</span>
+            <div class="style-grid">
+              <button type="button" class="style-btn"
+                *ngFor="let s of styleOptions"
+                [class.selected]="formData.style === s.value"
+                (click)="formData.style = s.value">
+                <i [class]="s.icon"></i>
+                <span>{{ s.label }}</span>
+              </button>
+            </div>
+          </label>
+
+          <div class="btn-row">
+            <button class="btn secondary" type="button" (click)="prevStep()">
+              <i class="fa-solid fa-arrow-left"></i> Retour
+            </button>
+            <button class="btn primary" type="button" (click)="nextStep()">
+              Continuer <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 3: Portfolio -->
+        <div class="form-step" *ngIf="currentStep === 3">
+          <label class="field" for="portfolio">
+            <span>Lien portfolio / Instagram / Behance</span>
+            <div class="portfolio-input-wrapper">
+              <i class="fa-solid fa-link portfolio-icon"></i>
+              <input id="portfolio" name="portfolio" type="url"
+                [(ngModel)]="formData.portfolio"
+                placeholder="https://instagram.com/ton-portfolio"
+                class="with-icon">
+            </div>
+          </label>
+
+          <div class="portfolio-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            Un portfolio visible rassure les fashionistas et augmente vos réservations.
+          </div>
+
+          <div class="btn-row">
+            <button class="btn secondary" type="button" (click)="prevStep()">
+              <i class="fa-solid fa-arrow-left"></i> Retour
+            </button>
+            <button class="btn primary" type="submit" [disabled]="isLoading">
+              <i class="fa-solid fa-check"></i>
+              {{ isLoading ? 'Création...' : 'Créer mon profil' }}
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+      <p class="status" *ngIf="message"><i class="fa-solid fa-circle-info"></i>{{ message }}</p>
+    </section>
+
+    <!-- Side panel -->
+    <aside class="experience-panel" aria-hidden="true">
+      <div class="wardrobe-preview">
+        <div class="preview-header">
+          <div>
+            <span>Mes clients</span>
+            <strong>18 suivis</strong>
+          </div>
+          <i class="fa-solid fa-scissors"></i>
+        </div>
+        <div class="closet-grid">
+          <span>👗</span>
+          <span class="selected">✂️</span>
+          <span>🪡</span>
+          <span class="selected">📐</span>
+          <span>🧵</span>
+          <span>💼</span>
+        </div>
+      </div>
+      <div class="look-strip">
+        <div>
+          <span>Projet en cours</span>
+          <strong>Collection été</strong>
+        </div>
+        <div>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+      </div>
+      <div class="insight-list">
+        <span><i class="fa-solid fa-handshake"></i> Mise en relation clients</span>
+        <span><i class="fa-solid fa-chart-line"></i> Suivi de réputation</span>
+        <span><i class="fa-solid fa-calendar-check"></i> Gestion rendez-vous</span>
+      </div>
+    </aside>
+  </section>
+</main>

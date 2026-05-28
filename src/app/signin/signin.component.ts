@@ -9,11 +9,13 @@ import { AuthUser } from '../core/auth/auth.models';
 
 @Component({
   selector: 'app-signin',
+  standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './signin.component.html',
-  styleUrl: './signin.component.css'
+  styleUrls: ['./signin.component.css']
 })
 export class SigninComponent {
+
   email = '';
   password = '';
   message = '';
@@ -28,35 +30,59 @@ export class SigninComponent {
     this.message = '';
     this.isLoading = true;
 
-    this.authService.signIn({ email: this.email, password: this.password }).subscribe({
-      next: user => {
+    this.authService.signIn({
+      email: this.email,
+      password: this.password
+    }).subscribe({
+
+      next: (user: AuthUser) => {
         this.isLoading = false;
+
+        // ✅ AuthService.storeSession() already persists the user to localStorage.
+        // Do NOT call localStorage.setItem('glossfit_user') here — it would
+        // overwrite the session with a stale object that may be missing fields.
+
         void Swal.fire({
           icon: 'success',
-          title: 'Connexion reussie',
+          title: 'Connexion réussie',
           text: 'Bienvenue sur GlossFit.',
           confirmButtonText: 'Continuer',
           confirmButtonColor: '#a46e51',
         });
+
         void this.router.navigate([this.getProfileRoute(user)]);
       },
+
       error: (error: Error) => {
         this.isLoading = false;
         this.message = error.message;
+
         void Swal.fire({
           icon: 'error',
           title: 'Connexion impossible',
-          text: error.message,
-          confirmButtonText: 'Reessayer',
+          text: this.message,
+          confirmButtonText: 'Réessayer',
           confirmButtonColor: '#a46e51',
         });
-      },
+      }
     });
   }
 
+  // ================= ROUTING LOGIC =================
   private getProfileRoute(user: AuthUser): string {
-    return user.role === 'STYLISTE'
-      ? `/profilestyliste/${user.id}`
-      : `/profilefashionista/${user.id}`;
+    if (user.role === 'ADMIN') {
+      return '/adminDashbord';
+    }
+
+    if (user.role === 'STYLISTE') {
+      return user.hasProfile
+        ? `/profilestyliste/${user.id}`
+        : `/createprofilestyliste/${user.id}`;
+    }
+
+    // FASHIONISTA
+    return user.hasProfile
+      ? `/profilefashionista/${user.id}`
+      : `/createprofilefashionista/${user.id}`;
   }
 }

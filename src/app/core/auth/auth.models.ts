@@ -8,6 +8,7 @@ export interface AuthResponse {
   userId: number;
   email: string;
   role: UserRole | string;
+  hasProfile?: boolean;
 }
 
 export interface SignInRequest {
@@ -25,6 +26,7 @@ export interface AuthUser {
   id: number;
   email: string;
   role: UserRole;
+  hasProfile?: boolean;
   emailVerified?: boolean;
   accountVerified?: boolean;
   active?: boolean;

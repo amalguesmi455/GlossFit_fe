@@ -6,7 +6,7 @@
         <span class="logo-text">GlossFit</span>
       </a>
 
-      <div class="nav-right">
+      <div class="nav-right" *ngIf="!isCreateProfilePage">
         <div class="nav-menu">
           <ng-container *ngIf="isLoggedIn; else landingMenu">
             <a class="nav-link" routerLink="/feed" routerLinkActive="active">Feed</a>
@@ -75,7 +75,7 @@
       </div>
     </div>
 
-    <div class="mobile-menu" [class.open]="isMobileMenuOpen">
+    <div class="mobile-menu" [class.open]="isMobileMenuOpen" *ngIf="!isCreateProfilePage">
       <button class="mobile-language" type="button" (click)="toggleLanguage()">
         <i class="fa-solid fa-language lang-icon"></i>
         <span>{{ language === 'fr' ? 'Francais' : 'English' }}</span>

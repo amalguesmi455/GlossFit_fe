@@ -10,6 +10,7 @@ import { LandingPageComponent } from './landing-page/landing-page.component';
 import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { CreateProfileFashionistaComponent } from './create-profile-fashionista/create-profile-fashionista.component';
 import { CreateProfileStylisteComponent } from './create-profile-styliste/create-profile-styliste.component';
+import { AdminDashbordComponent } from './admin-dashbord/admin-dashbord.component';
 
 export const routes: Routes = [
 
@@ -17,17 +18,16 @@ export const routes: Routes = [
         { path: 'signin', component: SigninComponent },
         { path: 'signup', component: SignupComponent },
         { path: 'verify-email', component: VerifyEmailComponent },
-        { path:'dressing',component: DressingComponent },
-        { path:'demand',component: DemandComponent },
-        {path:'home',component: HomeComponent},
-        {path:'profilestyliste',component: ProfilStylisteComponent},
-        {path:'profilestyliste/:id',component: ProfilStylisteComponent},
-        {path:'profilestyliste/:id/dressing',component: DressingComponent},
+        { path: 'dressing', component: DressingComponent },
+        { path: 'demand', component: DemandComponent },
+        { path: 'home', component: HomeComponent },
+        { path: 'profilestyliste', component: ProfilStylisteComponent },
+        { path: 'profilestyliste/:id', component: ProfilStylisteComponent },
+        { path: 'profilestyliste/:id/dressing', component: DressingComponent },
         { path: 'profilefashionista', component: ProfilFashionistaComponent },
         { path: 'profilefashionista/:id', component: ProfilFashionistaComponent },
-        { path: 'createprofilefashionista', component: CreateProfileFashionistaComponent },
-        { path: 'createprofileStyliste', component: CreateProfileStylisteComponent },
-        
-
+        { path: 'createprofilefashionista/:id', component: CreateProfileFashionistaComponent },
+        { path: 'createprofilestyliste/:id', component: CreateProfileStylisteComponent },
+        { path: 'adminDashbord', component: AdminDashbordComponent },
 
 ];

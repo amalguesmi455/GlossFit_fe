@@ -64,6 +64,19 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
+  /**
+   * Call this after a profile is successfully created or deleted
+   * to keep the local session in sync with the database.
+   */
+  updateHasProfile(value: boolean): void {
+    const user = this.currentUser;
+    if (!user) return;
+
+    const updated: AuthUser = { ...user, hasProfile: value };
+    localStorage.setItem(USER_KEY, JSON.stringify(updated));
+    this.currentUserSubject.next(updated);
+  }
+
   getAccessToken(): string | null {
     const token = localStorage.getItem(ACCESS_TOKEN_KEY);
     return token && token !== 'undefined' ? token : null;
@@ -77,7 +90,7 @@ export class AuthService {
   private storeSession(response: AuthResponse): void {
     if (!response.accessToken || !response.refreshToken) {
       this.logout();
-      throw new Error(response.message || 'Compte non connecte. Veuillez verifier votre email puis vous connecter.');
+      throw new Error(response.message || 'Compte non connecté. Veuillez vérifier votre email puis vous connecter.');
     }
 
     const user = this.toUser(response);
@@ -110,6 +123,7 @@ export class AuthService {
       id: response.userId,
       email: response.email,
       role: this.normalizeRole(response.role),
+      hasProfile: response.hasProfile ?? false,
     };
   }
 

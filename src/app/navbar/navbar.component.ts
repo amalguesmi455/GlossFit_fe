@@ -107,6 +107,11 @@ export class NavbarComponent implements OnInit {
     void this.router.navigate(['/']);
   }
 
+  get isCreateProfilePage(): boolean {
+    return this.router.url.startsWith("/createprofilefashionista") ||
+           this.router.url.startsWith("/createprofilestyliste");
+  }
+
   get profileRoute(): string {
     return this.user.role === 'STYLISTE'
       ? `/profilestyliste/${this.user.id}`
