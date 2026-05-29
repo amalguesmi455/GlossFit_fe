@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import Swal from 'sweetalert2';
 import { StylisteProfileService } from '../core/styliste-profile.service';
+import { AuthService } from '../core/auth/auth.service';
 
 @Component({
   selector: 'app-create-profile-styliste',
@@ -16,6 +18,7 @@ export class CreateProfileStylisteComponent implements OnInit {
   isLoading = false;
   message = '';
   avatarPreview: string | null = null;
+  userId: number = 0;
 
   formData = {
     nom: '',
@@ -46,18 +49,20 @@ export class CreateProfileStylisteComponent implements OnInit {
     { label: 'Chic', value: 'chic', icon: 'fa-solid fa-crown' }
   ];
 
-  userId: number | null = null;
-
-  constructor(private profileService: StylisteProfileService) {
-    // TODO: Remplacer par récupération de l'ID utilisateur depuis AuthService
-    // Pour maintenant, utiliser une valeur par défaut ou depuis localStorage
-    const storedUserId = localStorage.getItem('userId');
-    this.userId = storedUserId ? parseInt(storedUserId, 10) : 1; // Default to 1 for testing
-  }
+  constructor(
+    private profileService: StylisteProfileService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
-    console.log('[v0] StylisteComponent initialized, formData:', this.formData);
-    console.log('[v0] Current userId:', this.userId);
+    const user = this.authService.currentUser;
+    if (!user) {
+      this.router.navigate(['/signin']);
+      return;
+    }
+    this.userId = user.id;
+    console.log('[v0] StylisteComponent initialized, userId:', this.userId);
   }
 
   onFileSelected(event: any) {
@@ -73,77 +78,56 @@ export class CreateProfileStylisteComponent implements OnInit {
   }
 
   nextStep() {
-    // Validation pour step 1
     if (this.currentStep === 1) {
       if (!this.formData.nom || !this.formData.prenom) {
         this.message = 'Erreur: Veuillez remplir tous les champs obligatoires';
-        console.log('[v0] Step 1 validation failed - missing required fields');
         return;
       }
     }
-
-    // Validation pour step 2
     if (this.currentStep === 2) {
       if (!this.formData.stylistSpecialty || !this.formData.style) {
         this.message = 'Erreur: Veuillez remplir tous les champs obligatoires';
-        console.log('[v0] Step 2 validation failed');
         return;
       }
     }
-
     this.currentStep++;
     this.message = '';
-    console.log('[v0] Moving to step:', this.currentStep);
   }
 
   prevStep() {
     if (this.currentStep > 1) {
       this.currentStep--;
       this.message = '';
-      console.log('[v0] Moving back to step:', this.currentStep);
     }
   }
 
   submit() {
-    console.log('[v0] Submit called with formData:', this.formData);
-
-    // Validation finale
     if (!this.formData.nom || !this.formData.prenom) {
       this.message = 'Erreur: Veuillez remplir tous les champs obligatoires';
-      console.log('[v0] Final validation failed - missing nom or prenom');
       return;
     }
-
     if (!this.formData.stylistSpecialty || !this.formData.style) {
       this.message = 'Erreur: Veuillez selectionner votre specialite et style';
-      console.log('[v0] Final validation failed - missing specialty or style');
       return;
     }
-
     if (!this.formData.portfolio) {
       this.message = 'Erreur: Veuillez ajouter un lien portfolio/Instagram';
-      console.log('[v0] Final validation failed - missing portfolio');
       return;
     }
-
     if (!this.userId) {
       this.message = 'Erreur: Impossible de recuperer votre ID utilisateur';
-      console.log('[v0] Cannot submit - userId is missing');
       return;
     }
 
     this.isLoading = true;
-    console.log('[v0] Submitting profile with userId:', this.userId);
 
     this.profileService.createProfile(this.formData, this.userId).subscribe({
       next: (response: any) => {
         console.log('[v0] Profile created successfully:', response);
         this.isLoading = false;
-        this.message = 'Profil cree avec succes!';
-        // Redirection après succès
-        setTimeout(() => {
-          // TODO: Ajouter navigation vers dashboard
-        }, 2000);
+        this.authService.updateHasProfile(true);
+        // Navigate to feed with a state flag — the feed will read it and fire the Swal
+        this.router.navigate(['/feed'], { state: { profileCreated: true } });
       },
       error: (error: any) => {
         console.log('[v0] Error creating profile:', error);

@@ -21,7 +21,6 @@ export class CreateProfileFashionistaComponent implements OnInit {
   message = '';
   avatarPreview: string | null = null;
 
-  // ================= FORM =================
   formData = {
     nom: '',
     prenom: '',
@@ -34,7 +33,6 @@ export class CreateProfileFashionistaComponent implements OnInit {
     profilePicture: null as File | null
   };
 
-  // ================= OPTIONS =================
   tailles = [
     { label: 'Petite', value: 'petite' },
     { label: 'Moyenne', value: 'moyenne' },
@@ -61,27 +59,26 @@ export class CreateProfileFashionistaComponent implements OnInit {
 
   constructor(
     private profileService: FashionistaProfileService,
-    private authService: AuthService,  // ✅ use AuthService, not raw localStorage
+    private authService: AuthService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
-    console.log('[INIT] Fashionista profile component loaded');
+    const user = this.authService.currentUser;
+    if (!user) {
+      this.router.navigate(['/signin']);
+    }
   }
 
-  // ================= TEMPLATE HELPER =================
   getSkintoneColor(value: string): string {
     return this.skinTones.find(t => t.value === value)?.color || '#000';
   }
 
-  // ================= FILE HANDLING =================
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
-
     if (file) {
       this.formData.profilePicture = file;
-
       const reader = new FileReader();
       reader.onload = (e) => {
         this.avatarPreview = e.target?.result as string;
@@ -90,7 +87,6 @@ export class CreateProfileFashionistaComponent implements OnInit {
     }
   }
 
-  // ================= STEPS =================
   nextStep(): void {
     this.currentStep++;
   }
@@ -99,11 +95,8 @@ export class CreateProfileFashionistaComponent implements OnInit {
     this.currentStep--;
   }
 
-  // ================= SUBMIT =================
   submit(): void {
-    // ✅ Read user from AuthService (single source of truth)
     const user = this.authService.currentUser;
-
     if (!user) {
       this.message = 'Utilisateur non connecté';
       return;
@@ -112,25 +105,15 @@ export class CreateProfileFashionistaComponent implements OnInit {
     this.isLoading = true;
 
     this.profileService.createProfile(this.formData, user.id).subscribe({
-
       next: () => {
         this.isLoading = false;
-
-        // ✅ KEY FIX: update hasProfile in the local session so routing
-        // works correctly on next navigation without needing a new login
         this.authService.updateHasProfile(true);
-
-        void Swal.fire({
-          icon: 'success',
-          title: 'Profil créé !',
-          text: 'Votre profil a été créé avec succès.',
-          confirmButtonText: 'Continuer',
-          confirmButtonColor: '#a46e51',
-        }).then(() => {
-          void this.router.navigate([`/profilefashionista/${user.id}`]);
-        });
+        // Navigate first, then Swal fires in the destination component
+        void this.router.navigate(
+          [`/profilefashionista/${user.id}`],
+          { state: { profileCreated: true } }
+        );
       },
-
       error: (err: any) => {
         this.isLoading = false;
         this.message = err?.error?.message || 'Erreur lors de la création du profil';

@@ -11,6 +11,7 @@ import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { CreateProfileFashionistaComponent } from './create-profile-fashionista/create-profile-fashionista.component';
 import { CreateProfileStylisteComponent } from './create-profile-styliste/create-profile-styliste.component';
 import { AdminDashbordComponent } from './admin-dashbord/admin-dashbord.component';
+import { FeedComponent } from './feed/feed.component';
 
 export const routes: Routes = [
 
@@ -29,5 +30,6 @@ export const routes: Routes = [
         { path: 'createprofilefashionista/:id', component: CreateProfileFashionistaComponent },
         { path: 'createprofilestyliste/:id', component: CreateProfileStylisteComponent },
         { path: 'adminDashbord', component: AdminDashbordComponent },
+        {path: 'feed', component:FeedComponent},
 
 ];
