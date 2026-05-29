@@ -1,94 +1,254 @@
 <main class="profile-page">
-  <section class="profile-layout">
+
+  <!-- ── Loading state ───────────────────────────────────────────────────── -->
+  <div *ngIf="loading" class="state-overlay">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <p>Chargement du profil…</p>
+  </div>
+
+  <!-- ── Error state ─────────────────────────────────────────────────────── -->
+  <div *ngIf="!loading && error && !profile" class="state-overlay error">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <p>{{ error }}</p>
+    <button class="btn primary" (click)="loadProfile()">Réessayer</button>
+  </div>
+
+  <!-- ── Main layout ─────────────────────────────────────────────────────── -->
+  <section class="profile-layout" *ngIf="!loading && profile">
     <article class="profile-identity">
-      <div class="profile-card stylist">
+
+      <!-- ── Profile card ── -->
+      <div class="profile-card">
         <div class="profile-top">
           <span class="eyebrow"><i class="fa-solid fa-user-tie"></i> Profil styliste</span>
           <span class="status-pill"><i class="fa-solid fa-calendar-check"></i> Disponible</span>
         </div>
 
-        <div class="avatar-frame">
-          <span>{{ profile.name.charAt(0) }}</span>
+        <!-- Avatar: clickable only in edit mode -->
+        <div class="avatar-frame"
+             [class.avatar-editable]="isEditing"
+             (click)="isEditing && avatarInput.click()"
+             [title]="isEditing ? 'Changer la photo' : ''">
+          <img *ngIf="displayPictureUrl; else initials"
+               [src]="displayPictureUrl"
+               [alt]="fullName"
+               class="avatar-img"
+               (error)="previewUrl = null; profilePictureUrl = null" />
+          <ng-template #initials>
+            <span class="avatar-initial">{{ initialsText }}</span>
+          </ng-template>
+          <div class="avatar-overlay" *ngIf="isEditing">
+            <i class="fa-solid fa-camera"></i>
+          </div>
         </div>
+        <input #avatarInput type="file" accept="image/*"
+               class="file-input-hidden"
+               (change)="onFileChange($event)" />
 
-        <h1>{{ profile.name }}</h1>
-        <p>{{ profile.bio }}</p>
+        <h1>{{ fullName }}</h1>
+        <p class="profile-subtitle">{{ profile.style }}</p>
 
-        <div class="profile-stats" aria-label="Resume styliste">
+        <div class="profile-stats" aria-label="Résumé styliste">
           <div>
-            <strong>{{ profile.price }}</strong>
-            <span>Tarif</span>
+            <strong>{{ profile.stylistSpecialty || '—' }}</strong>
+            <span>Spécialité</span>
           </div>
           <div>
-            <strong>18</strong>
-            <span>Briefs</span>
+            <strong>{{ profile.experienceYears }}</strong>
+            <span>Ans d'exp.</span>
           </div>
           <div>
-            <strong>4.9</strong>
-            <span>Note</span>
+            <strong>{{ profile.ville || '—' }}</strong>
+            <span>Ville</span>
           </div>
         </div>
       </div>
 
+      <!-- ── Mini board ── -->
       <div class="mini-board" aria-label="Fiche styliste">
         <div class="board-head">
           <span><i class="fa-solid fa-scissors"></i> Signature style</span>
-          <small>{{ profile.city }}</small>
+          <small>{{ profile.ville }}</small>
         </div>
         <div class="tag-row">
-          <span>{{ profile.specialty }}</span>
-          <span>{{ profile.city }}</span>
-          <span>{{ profile.price }}</span>
-          <span>{{ profile.availability }}</span>
+          <span>{{ profile.stylistSpecialty }}</span>
+          <span>{{ profile.ville }}</span>
+          <span>{{ profile.experienceYears }} ans</span>
+          <span *ngIf="profile.portfolio">
+            <a [href]="profile.portfolio" target="_blank" rel="noopener">Portfolio</a>
+          </span>
         </div>
-        <div class="actions profile-actions">
-          <a class="btn primary" routerLink="/demand"><i class="fa-solid fa-inbox"></i> Voir les demandes</a>
-          <a class="btn soft" routerLink="/dressing"><i class="fa-solid fa-shirt"></i> Consulter dressing</a>
+        <div class="profile-actions">
+          <a class="btn primary" routerLink="/demand">
+            <i class="fa-solid fa-inbox"></i> Voir les demandes
+          </a>
+          <a class="btn soft" routerLink="/dressing">
+            <i class="fa-solid fa-shirt"></i> Consulter dressing
+          </a>
         </div>
       </div>
+
     </article>
 
+    <!-- ── Edit panel ── -->
     <article class="edit-panel">
-      <span class="eyebrow"><i class="fa-solid fa-pen-to-square"></i> Modifier fiche</span>
-      <h2>Mettre a jour la fiche styliste</h2>
-      <p class="panel-intro">Une fiche claire aide les clientes a comprendre ton univers avant le brief.</p>
 
-      <form class="form profile-form" (ngSubmit)="save()">
-        <div class="field">
-          <label for="name">Nom</label>
-          <input id="name" name="name" [(ngModel)]="draft.name">
+      <!-- Panel header -->
+      <div class="panel-header">
+        <div class="panel-header-text">
+          <span class="eyebrow"><i class="fa-solid fa-pen-to-square"></i> Modifier fiche</span>
+          <h2>{{ isEditing ? 'Modification en cours…' : 'Ta fiche styliste' }}</h2>
+          <p class="panel-intro">Une fiche claire aide les clientes à comprendre ton univers avant le brief.</p>
         </div>
+
+        <!-- Icon buttons top-right -->
+        <div class="panel-actions-top">
+
+          <!-- VIEW MODE: edit + delete -->
+          <ng-container *ngIf="!isEditing">
+            <button class="icon-btn icon-btn--edit"
+                    type="button"
+                    (click)="startEdit()"
+                    title="Modifier la fiche">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="icon-btn icon-btn--delete"
+                    type="button"
+                    (click)="confirmDelete()"
+                    title="Supprimer le profil">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </ng-container>
+
+          <!-- EDIT MODE: cancel + save -->
+          <ng-container *ngIf="isEditing">
+            <button class="icon-btn icon-btn--cancel"
+                    type="button"
+                    (click)="cancelEdit()"
+                    [disabled]="saving"
+                    title="Annuler les modifications">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button class="icon-btn icon-btn--save"
+                    type="button"
+                    [disabled]="saving"
+                    (click)="save()"
+                    title="Enregistrer les modifications">
+              <i class="fa-solid"
+                 [class.fa-check]="!saving"
+                 [class.fa-spinner]="saving"
+                 [class.fa-spin]="saving"></i>
+            </button>
+          </ng-container>
+
+        </div>
+      </div>
+
+      <!-- READ MODE: info summary -->
+      <div class="info-summary" *ngIf="!isEditing">
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-user"></i> Nom complet</span>
+            <span class="info-value">{{ fullName }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-location-dot"></i> Ville</span>
+            <span class="info-value">{{ profile.ville || '—' }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-scissors"></i> Spécialité</span>
+            <span class="info-value">{{ profile.stylistSpecialty || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-star"></i> Expérience</span>
+            <span class="info-value">{{ profile.experienceYears != null ? profile.experienceYears + ' ans' : '—' }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item full-width">
+            <span class="info-label"><i class="fa-solid fa-link"></i> Portfolio</span>
+            <span class="info-value">
+              <a *ngIf="profile.portfolio; else noPortfolio"
+                 [href]="profile.portfolio" target="_blank" rel="noopener">
+                {{ profile.portfolio }}
+              </a>
+              <ng-template #noPortfolio>—</ng-template>
+            </span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item full-width">
+            <span class="info-label"><i class="fa-solid fa-pen-nib"></i> Univers stylistique</span>
+            <span class="info-value">{{ profile.style || '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT MODE: form -->
+      <form class="form profile-form" *ngIf="isEditing" (ngSubmit)="save()">
+
+        <!-- Nom / Prénom -->
         <div class="form-grid">
           <div class="field">
-            <label for="specialty">Specialite</label>
-            <input id="specialty" name="specialty" [(ngModel)]="draft.specialty">
+            <label for="prenom">Prénom</label>
+            <input id="prenom" name="prenom" [(ngModel)]="draft.prenom" required />
+          </div>
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input id="nom" name="nom" [(ngModel)]="draft.nom" required />
+          </div>
+        </div>
+
+        <!-- Spécialité / Ville -->
+        <div class="form-grid">
+          <div class="field">
+            <label for="specialty">Spécialité</label>
+            <input id="specialty" name="specialty" [(ngModel)]="draft.specialty" />
           </div>
           <div class="field">
             <label for="city">Ville</label>
-            <input id="city" name="city" [(ngModel)]="draft.city">
+            <input id="city" name="city" [(ngModel)]="draft.city" />
           </div>
         </div>
+
+        <!-- Expérience / Portfolio -->
         <div class="form-grid">
           <div class="field">
-            <label for="price">Tarif</label>
-            <input id="price" name="price" [(ngModel)]="draft.price">
+            <label for="experienceYears">Années d'expérience</label>
+            <input id="experienceYears" name="experienceYears" type="number" min="0"
+                   [(ngModel)]="draft.experienceYears" />
           </div>
           <div class="field">
-            <label for="availability">Disponibilite</label>
-            <input id="availability" name="availability" [(ngModel)]="draft.availability">
+            <label for="portfolio">Portfolio (URL)</label>
+            <input id="portfolio" name="portfolio" type="url" [(ngModel)]="draft.portfolio" />
           </div>
         </div>
+
+        <!-- Univers stylistique -->
         <div class="field">
-          <label for="bio">Bio</label>
-          <textarea id="bio" name="bio" [(ngModel)]="draft.bio"></textarea>
+          <label for="style">Univers stylistique</label>
+          <textarea id="style" name="style" [(ngModel)]="draft.style"></textarea>
         </div>
-        <div class="actions">
-          <button class="btn primary" type="submit"><i class="fa-solid fa-check"></i> Enregistrer</button>
-          <button class="btn soft" type="button" (click)="reset()">Annuler</button>
+
+        <!-- New photo preview -->
+        <div class="field" *ngIf="previewUrl">
+          <label>Nouvelle photo <span class="preview-badge">aperçu</span></label>
+          <div class="preview-wrap">
+            <img [src]="previewUrl" alt="Aperçu" class="avatar-preview-img" />
+            <span class="preview-hint"><i class="fa-solid fa-circle-info"></i> Sera enregistrée à la sauvegarde.</span>
+          </div>
         </div>
+
+        <!-- API error inside form -->
+        <p class="error-msg" *ngIf="error">
+          <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
+        </p>
+
       </form>
 
-      <p class="saved" *ngIf="saved"><i class="fa-solid fa-circle-check"></i> Fiche styliste mise a jour.</p>
     </article>
   </section>
+
 </main>

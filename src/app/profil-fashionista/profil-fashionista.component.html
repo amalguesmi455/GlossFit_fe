@@ -1,5 +1,17 @@
-<main class="profile-page">
+<!-- Loading skeleton -->
+<main class="profile-page" *ngIf="isLoading">
+  <div class="skeleton-wrap">
+    <div class="skeleton avatar-skel"></div>
+    <div class="skeleton line-skel w60"></div>
+    <div class="skeleton line-skel w40"></div>
+  </div>
+</main>
+
+<!-- Profile loaded -->
+<main class="profile-page" *ngIf="!isLoading && profile">
   <section class="profile-layout">
+
+    <!-- ── Identity card ── -->
     <article class="profile-identity">
       <div class="profile-card">
         <div class="profile-top">
@@ -7,88 +19,214 @@
           <span class="status-pill"><i class="fa-solid fa-sparkles"></i> Capsule active</span>
         </div>
 
-        <div class="avatar-frame">
-          <span>{{ profile.name.charAt(0) }}</span>
+        <!-- Avatar: clickable only in edit mode -->
+        <div class="avatar-frame"
+             [class.avatar-editable]="isEditing"
+             (click)="isEditing && avatarInput.click()"
+             [title]="isEditing ? 'Changer la photo' : ''">
+          <img *ngIf="displayAvatar; else initials"
+               [src]="displayAvatar"
+               alt="Photo de profil"
+               class="avatar-img" />
+          <ng-template #initials>
+            <span class="avatar-initial">{{ avatarInitial }}</span>
+          </ng-template>
+          <div class="avatar-overlay" *ngIf="isEditing">
+            <i class="fa-solid fa-camera"></i>
+          </div>
         </div>
+        <input #avatarInput type="file" accept="image/*"
+               style="display:none"
+               (change)="onFileSelected($event)" />
 
-        <h1>{{ profile.name }}</h1>
-        <p>{{ profile.bio }}</p>
+        <h1>{{ profile.prenom }} {{ profile.nom }}</h1>
+        <p class="profile-ville"><i class="fa-solid fa-location-dot"></i> {{ profile.ville }}</p>
 
-        <div class="profile-stats" aria-label="Resume fashionista">
+        <div class="profile-stats">
           <div>
-            <strong>{{ profile.size }}</strong>
+            <strong>{{ profile.taille || '—' }}</strong>
             <span>Taille</span>
           </div>
           <div>
-            <strong>{{ profile.budget }}</strong>
-            <span>Budget</span>
+            <strong>{{ profile.poids ? profile.poids + ' kg' : '—' }}</strong>
+            <span>Poids</span>
           </div>
           <div>
-            <strong>12</strong>
-            <span>Looks</span>
+            <strong>{{ profile.morphologie || '—' }}</strong>
+            <span>Morpho</span>
           </div>
         </div>
       </div>
 
-      <div class="mini-board" aria-label="Preferences style">
+      <div class="mini-board">
         <div class="board-head">
-          <span><i class="fa-solid fa-palette"></i> Preferences</span>
-          <small>{{ profile.city }}</small>
+          <span><i class="fa-solid fa-palette"></i> Préférences</span>
+          <small>{{ profile.ville }}</small>
         </div>
         <div class="tag-row">
-          <span>{{ profile.city }}</span>
+          <span>{{ profile.ville }}</span>
           <span>{{ profile.style }}</span>
-          <span>Taille {{ profile.size }}</span>
-          <span>Budget {{ profile.budget }}</span>
+          <span>{{ profile.skinTone }}</span>
+          <span>{{ profile.morphologie }}</span>
         </div>
         <div class="actions profile-actions">
-          <a class="btn primary" routerLink="/demand"><i class="fa-solid fa-wand-magic-sparkles"></i> Demander un style</a>
-          <a class="btn soft" routerLink="/dressing"><i class="fa-solid fa-shirt"></i> Voir dressing</a>
+          <a class="btn primary" routerLink="/demand">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Demander un style
+          </a>
+          <a class="btn soft" routerLink="/dressing">
+            <i class="fa-solid fa-shirt"></i> Voir dressing
+          </a>
         </div>
       </div>
     </article>
 
+    <!-- ── Edit panel ── -->
     <article class="edit-panel">
-      <span class="eyebrow"><i class="fa-solid fa-pen-to-square"></i> Modifier profil</span>
-      <h2>Mettre a jour tes informations</h2>
-      <p class="panel-intro">Ces details aident le styliste a proposer des tenues plus justes.</p>
 
-      <form class="form profile-form" (ngSubmit)="save()">
-        <div class="field">
-          <label for="name">Nom</label>
-          <input id="name" name="name" [(ngModel)]="draft.name">
+      <!-- Panel header -->
+      <div class="panel-header">
+        <div class="panel-header-text">
+          <span class="eyebrow"><i class="fa-solid fa-pen-to-square"></i> Modifier profil</span>
+          <h2>{{ isEditing ? 'Modification en cours…' : 'Tes informations' }}</h2>
+          <p class="panel-intro">Ces détails aident le styliste à proposer des tenues plus justes.</p>
+        </div>
+
+        <!-- Icon buttons top-right -->
+        <div class="panel-actions-top">
+
+          <!-- VIEW MODE: edit + delete -->
+          <ng-container *ngIf="!isEditing">
+            <button class="icon-btn icon-btn--edit"
+                    type="button"
+                    (click)="startEdit()"
+                    title="Modifier le profil">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="icon-btn icon-btn--delete"
+                    type="button"
+                    (click)="confirmDelete()"
+                    title="Supprimer le profil">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </ng-container>
+
+          <!-- EDIT MODE: save (right) + cancel -->
+          <ng-container *ngIf="isEditing">
+            <button class="icon-btn icon-btn--cancel"
+                    type="button"
+                    (click)="cancelEdit()"
+                    [disabled]="isSaving"
+                    title="Annuler les modifications">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            <button class="icon-btn icon-btn--save"
+                    type="button"
+                    [disabled]="isSaving"
+                    (click)="save()"
+                    title="Enregistrer les modifications">
+              <i class="fa-solid"
+                 [class.fa-check]="!isSaving"
+                 [class.fa-spinner]="isSaving"
+                 [class.fa-spin]="isSaving"></i>
+            </button>
+          </ng-container>
+
+        </div>
+      </div>
+
+      <!-- READ MODE: tags summary -->
+      <div class="info-summary" *ngIf="!isEditing">
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-user"></i> Nom complet</span>
+            <span class="info-value">{{ profile.prenom }} {{ profile.nom }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-location-dot"></i> Ville</span>
+            <span class="info-value">{{ profile.ville || '—' }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-shirt"></i> Style</span>
+            <span class="info-value">{{ profile.style || '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-ruler-vertical"></i> Taille</span>
+            <span class="info-value">{{ profile.taille || '—' }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-weight-scale"></i> Poids</span>
+            <span class="info-value">{{ profile.poids ? profile.poids + ' kg' : '—' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label"><i class="fa-solid fa-droplet"></i> Carnation</span>
+            <span class="info-value">{{ profile.skinTone || '—' }}</span>
+          </div>
+        </div>
+        <div class="info-row">
+          <div class="info-item full-width">
+            <span class="info-label"><i class="fa-solid fa-person"></i> Morphologie</span>
+            <span class="info-value">{{ profile.morphologie || '—' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EDIT MODE: form -->
+      <form class="form profile-form" *ngIf="isEditing" (ngSubmit)="save()">
+        <div class="form-grid">
+          <div class="field">
+            <label for="prenom">Prénom</label>
+            <input id="prenom" name="prenom" [(ngModel)]="draft.prenom" required />
+          </div>
+          <div class="field">
+            <label for="nom">Nom</label>
+            <input id="nom" name="nom" [(ngModel)]="draft.nom" required />
+          </div>
         </div>
         <div class="form-grid">
           <div class="field">
-            <label for="city">Ville</label>
-            <input id="city" name="city" [(ngModel)]="draft.city">
+            <label for="ville">Ville</label>
+            <input id="ville" name="ville" [(ngModel)]="draft.ville" />
           </div>
           <div class="field">
-            <label for="style">Style prefere</label>
-            <input id="style" name="style" [(ngModel)]="draft.style">
+            <label for="style">Style préféré</label>
+            <input id="style" name="style" [(ngModel)]="draft.style" />
           </div>
         </div>
         <div class="form-grid">
           <div class="field">
-            <label for="size">Taille</label>
-            <input id="size" name="size" [(ngModel)]="draft.size">
+            <label for="taille">Taille</label>
+            <input id="taille" name="taille" [(ngModel)]="draft.taille" />
           </div>
           <div class="field">
-            <label for="budget">Budget</label>
-            <input id="budget" name="budget" [(ngModel)]="draft.budget">
+            <label for="poids">Poids (kg)</label>
+            <input id="poids" name="poids" type="number" [(ngModel)]="draft.poids" />
           </div>
         </div>
-        <div class="field">
-          <label for="bio">Bio</label>
-          <textarea id="bio" name="bio" [(ngModel)]="draft.bio"></textarea>
+        <div class="form-grid">
+          <div class="field">
+            <label for="skinTone">Carnation</label>
+            <input id="skinTone" name="skinTone" [(ngModel)]="draft.skinTone" />
+          </div>
+          <div class="field">
+            <label for="morphologie">Morphologie</label>
+            <input id="morphologie" name="morphologie" [(ngModel)]="draft.morphologie" />
+          </div>
         </div>
-        <div class="actions">
-          <button class="btn primary" type="submit"><i class="fa-solid fa-check"></i> Enregistrer</button>
-          <button class="btn soft" type="button" (click)="reset()">Annuler</button>
+
+        <!-- New photo preview -->
+        <div class="field preview-field" *ngIf="avatarPreview">
+          <label>Nouvelle photo <span class="preview-badge">aperçu</span></label>
+          <div class="preview-wrap">
+            <img [src]="avatarPreview" alt="Aperçu" class="avatar-preview-img" />
+            <span class="preview-hint"><i class="fa-solid fa-circle-info"></i> Sera enregistrée à la sauvegarde.</span>
+          </div>
         </div>
       </form>
 
-      <p class="saved" *ngIf="saved"><i class="fa-solid fa-circle-check"></i> Profil mis a jour.</p>
     </article>
   </section>
 </main>

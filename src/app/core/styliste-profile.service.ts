@@ -17,6 +17,7 @@ export interface StylisteProfileData {
 export interface StylisteProfile extends StylisteProfileData {
   id?: number;
   userId: number;
+  profilePictureUrl?: string; // ✅ URL returned by the backend (stored path in DB)
   createdAt?: string;
 }
 
@@ -27,26 +28,19 @@ export class StylisteProfileService {
 
   private apiUrl = `${environment.apiUrl}/profiles/styliste`;
 
-  // ✅ HttpClient only — the auth interceptor adds the Bearer token automatically
   constructor(private http: HttpClient) {}
 
+  // ✅ Resolves a stored relative path from the DB into a full URL
+  getProfilePictureUrl(relativePath: string | undefined): string | null {
+    if (!relativePath) return null;
+    // If the backend already returns an absolute URL, return it as-is
+    if (relativePath.startsWith('http')) return relativePath;
+    return `${environment.apiUrl}/${relativePath}`;
+  }
+
   createProfile(profileData: StylisteProfileData, userId: number): Observable<StylisteProfile> {
-    const formData = new FormData();
-
-    formData.append('nom', profileData.nom);
-    formData.append('prenom', profileData.prenom);
-    formData.append('ville', profileData.ville);
-    formData.append('experienceYears', profileData.experienceYears.toString());
-    formData.append('stylistSpecialty', profileData.stylistSpecialty);
-    formData.append('style', profileData.style);
-    formData.append('portfolio', profileData.portfolio);
+    const formData = this.buildFormData(profileData);
     formData.append('userId', userId.toString());
-
-    if (profileData.profilePicture) {
-      formData.append('profilePictureFile', profileData.profilePicture);
-    }
-
-    // ✅ No explicit headers — interceptor handles Authorization
     return this.http.post<StylisteProfile>(this.apiUrl, formData);
   }
 
@@ -59,8 +53,17 @@ export class StylisteProfileService {
   }
 
   updateProfile(userId: number, profileData: StylisteProfileData): Observable<StylisteProfile> {
-    const formData = new FormData();
+    const formData = this.buildFormData(profileData);
+    return this.http.put<StylisteProfile>(`${this.apiUrl}/${userId}`, formData);
+  }
 
+  deleteProfile(userId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${userId}`);
+  }
+
+  // ✅ Shared FormData builder — avoids duplication between create/update
+  private buildFormData(profileData: StylisteProfileData): FormData {
+    const formData = new FormData();
     formData.append('nom', profileData.nom);
     formData.append('prenom', profileData.prenom);
     formData.append('ville', profileData.ville);
@@ -68,15 +71,9 @@ export class StylisteProfileService {
     formData.append('stylistSpecialty', profileData.stylistSpecialty);
     formData.append('style', profileData.style);
     formData.append('portfolio', profileData.portfolio);
-
     if (profileData.profilePicture) {
       formData.append('profilePictureFile', profileData.profilePicture);
     }
-
-    return this.http.put<StylisteProfile>(`${this.apiUrl}/${userId}`, formData);
-  }
-
-  deleteProfile(userId: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${userId}`);
+    return formData;
   }
 }
