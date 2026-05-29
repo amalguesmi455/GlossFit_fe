@@ -11,6 +11,7 @@ import { VerifyEmailComponent } from './verify-email/verify-email.component';
 import { CreateProfileFashionistaComponent } from './create-profile-fashionista/create-profile-fashionista.component';
 import { CreateProfileStylisteComponent } from './create-profile-styliste/create-profile-styliste.component';
 import { AdminDashbordComponent } from './admin-dashbord/admin-dashbord.component';
+import { StylingRequestComponent } from './styling-request/styling-request.component';
 import { FeedComponent } from './feed/feed.component';
 
 export const routes: Routes = [
@@ -21,6 +22,8 @@ export const routes: Routes = [
         { path: 'verify-email', component: VerifyEmailComponent },
         { path: 'dressing', component: DressingComponent },
         { path: 'demand', component: DemandComponent },
+        { path: 'styling', component: StylingRequestComponent },
+        { path: 'styling-request', component: StylingRequestComponent },
         { path: 'home', component: HomeComponent },
         { path: 'profilestyliste', component: ProfilStylisteComponent },
         { path: 'profilestyliste/:id', component: ProfilStylisteComponent },

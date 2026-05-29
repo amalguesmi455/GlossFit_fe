@@ -10,6 +10,9 @@
         <div class="nav-menu">
           <ng-container *ngIf="isLoggedIn; else landingMenu">
             <a class="nav-link" routerLink="/feed" routerLinkActive="active">Feed</a>
+            <a class="nav-link" routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
+            <a class="nav-link" routerLink="/dressing" routerLinkActive="active">Dressing</a>
+            <a class="nav-link" routerLink="/styling" routerLinkActive="active">Styling</a>
             <a class="nav-link" [routerLink]="isAdmin ? '/adminDashbord' : '/home'" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
             <a class="nav-link" *ngIf="isFashionista" routerLink="/dressing" routerLinkActive="active">Dressing</a>
           </ng-container>
@@ -103,6 +106,9 @@
           </div>
         </div>
         <a class="mobile-link" routerLink="/feed" (click)="closeMobileMenu()">Feed</a>
+        <a class="mobile-link" routerLink="/home" (click)="closeMobileMenu()">Dashboard</a>
+        <a class="mobile-link" routerLink="/dressing" (click)="closeMobileMenu()">Dressing</a>
+        <a class="mobile-link" routerLink="/styling" (click)="closeMobileMenu()">Styling</a>
         <a class="mobile-link" [routerLink]="isAdmin ? '/adminDashbord' : '/home'" (click)="closeMobileMenu()">Dashboard</a>
         <a class="mobile-link" *ngIf="isFashionista" routerLink="/dressing" (click)="closeMobileMenu()">Dressing</a>
         <a class="mobile-link" [routerLink]="profileRoute" (click)="closeMobileMenu()">Mon profil</a>
