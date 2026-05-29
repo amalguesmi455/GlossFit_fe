@@ -1,23 +1,22 @@
-<div class="profile-page">
-  <div class="container">
-    <div class="header">
-      <h1 class="page-title"></h1>
-    </div>
+<main class="page auth-page create-profile-page">
+  <header class="auth-topbar">
+    <a class="brand-link" routerLink="/"><span>G</span>GlossFit</a>
+    <a class="topbar-link" routerLink="/signin">Deja membre</a>
+  </header>
 
-    <form (ngSubmit)="submit()" class="profile-form">
-      <h1 class="page-title">Créer votre profil Fashionista</h1>
-      <p class="page-subtitle">
-        Complétez votre profil pour trouver le styliste parfait
-      </p>
+  <section class="auth-layout profile-layout">
+    <section class="auth-copy" aria-labelledby="profile-title">
+      <span class="eyebrow"><i class="fa-solid fa-person-dress"></i> Fashionista</span>
+      <h1 id="profile-title">Ton profil style.</h1>
+      <p class="lead">Complete ton profil pour trouver le styliste parfait et recevoir des conseils vraiment adaptes.</p>
 
-      <!-- Step indicator -->
       <div class="steps">
         <span class="step" [class.active]="currentStep === 1" [class.done]="currentStep > 1">
-          <i class="fa-solid fa-user"></i> Identité
+          <i class="fa-solid fa-user"></i> Identite
         </span>
         <span class="step-sep"><i class="fa-solid fa-chevron-right"></i></span>
         <span class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2">
-          <i class="fa-solid fa-body"></i> Morphologie
+          <i class="fa-solid fa-ruler-combined"></i> Morphologie
         </span>
         <span class="step-sep"><i class="fa-solid fa-chevron-right"></i></span>
         <span class="step" [class.active]="currentStep === 3">
@@ -25,182 +24,181 @@
         </span>
       </div>
 
-      <!-- Error Alert -->
-      <div class="alert-error" *ngIf="message && message.includes('Erreur')">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        {{ message }}
-      </div>
+      <p class="status error" *ngIf="message && message.includes('Erreur')" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>{{ message }}
+      </p>
+      <p class="status success" *ngIf="message && !message.includes('Erreur')" role="status">
+        <i class="fa-solid fa-circle-check"></i>{{ message }}
+      </p>
 
-      <!-- Success Alert -->
-      <div class="alert-success" *ngIf="message && !message.includes('Erreur')">
-        <i class="fa-solid fa-circle-check"></i>
-        {{ message }}
-      </div>
+      <form class="form" (ngSubmit)="submit()" novalidate>
+        <div class="form-step" *ngIf="currentStep === 1">
+          <div class="field-row">
+            <label class="field" for="nom">
+              <span>Nom <em>*</em></span>
+              <input id="nom" type="text" [(ngModel)]="formData.nom" name="nom" required placeholder="Dupont" autocomplete="family-name">
+            </label>
 
-      <!-- Step 1: Identity -->
-      <div class="form-step" *ngIf="currentStep === 1">
-        <div class="form-group">
-          <label for="nom" class="form-label">Nom <em>*</em></label>
-          <input
-            id="nom"
-            type="text"
-            [(ngModel)]="formData.nom"
-            name="nom"
-            class="form-input"
-            placeholder="Dupont"
-          />
-        </div>
+            <label class="field" for="prenom">
+              <span>Prenom <em>*</em></span>
+              <input id="prenom" type="text" [(ngModel)]="formData.prenom" name="prenom" required placeholder="Marie" autocomplete="given-name">
+            </label>
+          </div>
 
-        <div class="form-group">
-          <label for="prenom" class="form-label">Prénom <em>*</em></label>
-          <input
-            id="prenom"
-            type="text"
-            [(ngModel)]="formData.prenom"
-            name="prenom"
-            class="form-input"
-            placeholder="Marie"
-          />
-        </div>
+          <label class="field" for="ville">
+            <span>Ville</span>
+            <input id="ville" type="text" [(ngModel)]="formData.ville" name="ville" placeholder="Paris" autocomplete="address-level2">
+          </label>
 
-        <div class="form-group">
-          <label for="ville" class="form-label">Ville</label>
-          <input
-            id="ville"
-            type="text"
-            [(ngModel)]="formData.ville"
-            name="ville"
-            class="form-input"
-            placeholder="Paris"
-          />
-        </div>
-
-        <div class="form-group">
-          <label for="profilePicture" class="form-label">Photo de profil</label>
-          <div class="avatar-upload" (click)="fileInput.click()">
-            <div class="avatar-preview" *ngIf="avatarPreview">
-              <img [src]="avatarPreview" alt="Aperçu">
+          <label class="field avatar-field" for="profilePicture">
+            <span>Photo de profil</span>
+            <div class="avatar-upload" (click)="fileInput.click()">
+              <div class="avatar-preview" *ngIf="avatarPreview">
+                <img [src]="avatarPreview" alt="Apercu">
+              </div>
+              <div class="avatar-placeholder" *ngIf="!avatarPreview">
+                <i class="fa-solid fa-camera"></i>
+                <span>Ajouter une photo</span>
+              </div>
             </div>
-            <div class="avatar-placeholder" *ngIf="!avatarPreview">
-              <i class="fa-solid fa-camera"></i>
-              <span>Ajouter une photo</span>
-            </div>
-          </div>
-          <input #fileInput id="profilePicture" name="profilePicture" type="file"
-            accept="image/*" (change)="onFileSelected($event)" hidden>
-        </div>
+            <input #fileInput id="profilePicture" name="profilePicture" type="file"
+              accept="image/*" (change)="onFileSelected($event)" hidden>
+          </label>
 
-        <button class="btn-submit" type="button" (click)="nextStep()" [disabled]="!formData.nom || !formData.prenom">
-          Continuer <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </div>
-
-      <!-- Step 2: Morphology -->
-      <div class="form-step" *ngIf="currentStep === 2">
-        <div class="form-group">
-          <label class="form-label">Taille</label>
-          <div class="size-grid">
-            <button
-              type="button"
-              class="size-btn"
-              *ngFor="let t of tailles"
-              [class.selected]="formData.taille === t.value"
-              (click)="formData.taille = t.value"
-            >
-              {{ t.label }}
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="poids" class="form-label">Poids (kg)</label>
-          <input
-            id="poids"
-            type="number"
-            [(ngModel)]="formData.poids"
-            name="poids"
-            class="form-input"
-            placeholder="60"
-            min="0"
-          />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Ton de peau</label>
-          <div class="skin-tone-grid">
-            <button
-              type="button"
-              class="skin-tone-btn"
-              *ngFor="let s of skinTones"
-              [class.selected]="formData.skinTone === s.value"
-              (click)="formData.skinTone = s.value"
-              [title]="s.label"
-            >
-              <i [class]="s.icon" [style.color]="getSkintoneColor(s.value)"></i>
-              <span>{{ s.label }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Morphologie</label>
-          <div class="style-grid">
-            <button
-              type="button"
-              class="style-btn"
-              *ngFor="let m of morphologies"
-              [class.selected]="formData.morphologie === m.value"
-              (click)="formData.morphologie = m.value"
-            >
-              <i [class]="m.icon"></i>
-              <span>{{ m.label }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn-secondary" type="button" (click)="prevStep()">
-            <i class="fa-solid fa-arrow-left"></i> Retour
-          </button>
-          <button class="btn-submit" type="button" (click)="nextStep()">
+          <button class="btn primary" type="button" (click)="nextStep()" [disabled]="!formData.nom || !formData.prenom">
             Continuer <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
-      </div>
 
-      <!-- Step 3: Style -->
-      <div class="form-step" *ngIf="currentStep === 3">
-        <div class="form-group">
-          <label class="form-label">Style préféré</label>
-          <div class="style-grid">
-            <button
-              type="button"
-              class="style-btn"
-              *ngFor="let s of styleOptions"
-              [class.selected]="formData.style === s.value"
-              (click)="formData.style = s.value"
-            >
-              <i [class]="s.icon"></i>
-              <span>{{ s.label }}</span>
+        <div class="form-step" *ngIf="currentStep === 2">
+          <label class="field">
+            <span>Taille</span>
+            <div class="size-grid">
+              <button
+                type="button"
+                class="choice-btn"
+                *ngFor="let t of tailles"
+                [class.selected]="formData.taille === t.value"
+                (click)="formData.taille = t.value">
+                {{ t.label }}
+              </button>
+            </div>
+          </label>
+
+          <label class="field" for="poids">
+            <span>Poids (kg)</span>
+            <input id="poids" type="number" [(ngModel)]="formData.poids" name="poids" placeholder="60" min="0">
+          </label>
+
+          <label class="field">
+            <span>Ton de peau</span>
+            <div class="skin-tone-grid">
+              <button
+                type="button"
+                class="choice-btn skin-tone-btn"
+                *ngFor="let s of skinTones"
+                [class.selected]="formData.skinTone === s.value"
+                (click)="formData.skinTone = s.value"
+                [title]="s.label">
+                <i [class]="s.icon" [style.color]="getSkintoneColor(s.value)"></i>
+                <span>{{ s.label }}</span>
+              </button>
+            </div>
+          </label>
+
+          <label class="field">
+            <span>Morphologie</span>
+            <div class="style-grid">
+              <button
+                type="button"
+                class="style-btn"
+                *ngFor="let m of morphologies"
+                [class.selected]="formData.morphologie === m.value"
+                (click)="formData.morphologie = m.value">
+                <i [class]="m.icon"></i>
+                <span>{{ m.label }}</span>
+              </button>
+            </div>
+          </label>
+
+          <div class="btn-row">
+            <button class="btn secondary" type="button" (click)="prevStep()">
+              <i class="fa-solid fa-arrow-left"></i> Retour
+            </button>
+            <button class="btn primary" type="button" (click)="nextStep()">
+              Continuer <i class="fa-solid fa-arrow-right"></i>
             </button>
           </div>
         </div>
 
-        <div class="style-hint">
-          <i class="fa-solid fa-circle-info"></i>
-          <span>Ces informations aideront les stylistes à mieux vous conseiller</span>
-        </div>
+        <div class="form-step" *ngIf="currentStep === 3">
+          <label class="field">
+            <span>Style prefere</span>
+            <div class="style-grid">
+              <button
+                type="button"
+                class="style-btn"
+                *ngFor="let s of styleOptions"
+                [class.selected]="formData.style === s.value"
+                (click)="formData.style = s.value">
+                <i [class]="s.icon"></i>
+                <span>{{ s.label }}</span>
+              </button>
+            </div>
+          </label>
 
-        <div class="btn-row">
-          <button class="btn-secondary" type="button" (click)="prevStep()">
-            <i class="fa-solid fa-arrow-left"></i> Retour
-          </button>
-          <button class="btn-submit" type="submit" [disabled]="isLoading">
-            <i class="fa-solid fa-check"></i>
-            {{ isLoading ? "Création..." : "Créer mon profil" }}
-          </button>
+          <div class="style-hint">
+            <i class="fa-solid fa-circle-info"></i>
+            <span>Ces informations aideront les stylistes a mieux vous conseiller.</span>
+          </div>
+
+          <div class="btn-row">
+            <button class="btn secondary" type="button" (click)="prevStep()">
+              <i class="fa-solid fa-arrow-left"></i> Retour
+            </button>
+            <button class="btn primary" type="submit" [disabled]="isLoading">
+              <i class="fa-solid fa-check"></i>
+              {{ isLoading ? "Creation..." : "Creer mon profil" }}
+            </button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <aside class="experience-panel" aria-hidden="true">
+      <div class="wardrobe-preview">
+        <div class="preview-header">
+          <div>
+            <span>Dressing</span>
+            <strong>24 pieces</strong>
+          </div>
+          <i class="fa-solid fa-shirt"></i>
+        </div>
+        <div class="closet-grid">
+          <span>Robe</span>
+          <span class="selected">Veste</span>
+          <span>Jean</span>
+          <span class="selected">Sac</span>
+          <span>Top</span>
+          <span>Look</span>
         </div>
       </div>
-    </form>
-  </div>
-</div>
+      <div class="look-strip">
+        <div>
+          <span>Brief actif</span>
+          <strong>Tenue brunch</strong>
+        </div>
+        <div>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+          <i class="fa-solid fa-star"></i>
+        </div>
+      </div>
+      <div class="insight-list">
+        <span><i class="fa-solid fa-wand-magic-sparkles"></i> Conseils personnalises</span>
+        <span><i class="fa-solid fa-heart"></i> Favoris sauvegardes</span>
+        <span><i class="fa-solid fa-calendar-check"></i> Looks pour chaque occasion</span>
+      </div>
+    </aside>
+  </section>
+</main>

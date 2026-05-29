@@ -135,7 +135,7 @@ export class AuthService {
   }
 
   private normalizeRole(role: string): UserRole {
-    const normalized = role.toUpperCase();
+    const normalized = String(role || '').replace(/^ROLE_/, '').toUpperCase();
 
     if (normalized === 'STYLISTE' || normalized === 'ADMIN') {
       return normalized;
