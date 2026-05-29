@@ -54,6 +54,10 @@ export class StylisteProfileService {
     return this.http.get<StylisteProfile>(`${this.apiUrl}/${userId}`);
   }
 
+  getAllProfiles(): Observable<StylisteProfile[]> {
+    return this.http.get<StylisteProfile[]>(this.apiUrl);
+  }
+
   updateProfile(userId: number, profileData: StylisteProfileData): Observable<StylisteProfile> {
     const formData = new FormData();
 

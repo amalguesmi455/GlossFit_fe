@@ -1,0 +1,269 @@
+﻿<main class="styling-page">
+  <section class="styling-layout">
+    <article class="hero-panel">
+      <div class="panel-top">
+        <span class="eyebrow">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          {{ viewerRole === 'STYLISTE' ? 'Espace styliste' : 'Espace fashionista' }}
+        </span>
+        <span class="status-pill">
+          <i class="fa-solid fa-layer-group"></i>
+          {{ requests.length }} demandes
+        </span>
+      </div>
+
+      <h1>{{ title }}</h1>
+      <p class="panel-intro">{{ subtitle }}</p>
+
+      <div class="brief-stats" aria-label="Statistiques des demandes">
+        <div>
+          <strong>{{ statusCounts.PENDING }}</strong>
+          <span>en attente</span>
+        </div>
+        <div>
+          <strong>{{ statusCounts.ACCEPTED }}</strong>
+          <span>acceptées</span>
+        </div>
+        <div>
+          <strong>{{ statusCounts.REFUSED }}</strong>
+          <span>refusées</span>
+        </div>
+      </div>
+
+      @if (message) {
+        <p class="panel-message">{{ message }}</p>
+      }
+
+      @if (showCreateForm) {
+        <div class="request-form-card">
+          <div class="panel-top">
+            <span class="eyebrow">
+              <i class="fa-solid fa-paper-plane"></i>
+              Nouveau brief
+            </span>
+            <span class="status-pill">
+              {{ stylists.length }} stylistes
+            </span>
+          </div>
+
+          <form class="request-form" (ngSubmit)="submitRequest()">
+            <div class="field">
+              <label>Styliste</label>
+              <p class="field-hint">Choisis le styliste qui recevra ta demande.</p>
+            </div>
+
+            <div class="stylist-list" aria-label="Liste des stylistes disponibles">
+              @for (stylist of stylists; track stylist.id) {
+                <button
+                  type="button"
+                  class="stylist-card"
+                  [class.active]="requestForm.stylisteId === stylist.id"
+                  (click)="chooseStylist(stylist)"
+                >
+                  <strong>{{ stylist.prenom }} {{ stylist.nom }}</strong>
+                </button>
+              } @empty {
+                <div class="empty-inline">
+                  Aucun styliste disponible pour le moment.
+                </div>
+              }
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="eventType">Type d'événement</label>
+                <select id="eventType" name="eventType" [(ngModel)]="requestForm.eventType" required>
+                  @for (option of eventTypeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="dressCode">Dress code</label>
+                <select id="dressCode" name="dressCode" [(ngModel)]="requestForm.dressCode" required>
+                  @for (option of dressCodeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="place">Lieu</label>
+                <select id="place" name="place" [(ngModel)]="requestForm.place" required>
+                  @for (option of placeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="eventDateTime">Date et heure</label>
+                <input id="eventDateTime" name="eventDateTime" type="datetime-local" [(ngModel)]="requestForm.eventDateTime" required>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="season">Saison</label>
+                <select id="season" name="season" [(ngModel)]="requestForm.season" required>
+                  @for (option of seasonOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="weather">Météo</label>
+                <select id="weather" name="weather" [(ngModel)]="requestForm.weather" required>
+                  @for (option of weatherOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="field">
+                <label for="theme">Thème</label>
+                <select id="theme" name="theme" [(ngModel)]="requestForm.theme" required>
+                  @for (option of themeOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="formalityLevel">Niveau de formalité</label>
+                <select id="formalityLevel" name="formalityLevel" [(ngModel)]="requestForm.formalityLevel" required>
+                  @for (option of formalityOptions; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                [(ngModel)]="requestForm.description"
+                placeholder="Explique ton besoin, tes contraintes et le rendu souhaité..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="suggestion-row">
+              @for (suggestion of descriptionSuggestions; track suggestion) {
+                <button type="button" class="suggestion-chip" (click)="applyDescriptionSuggestion(suggestion)">
+                  {{ suggestion }}
+                </button>
+              }
+            </div>
+
+            <button class="btn primary" type="submit" [disabled]="!canSubmitRequest">
+              <i class="fa-solid fa-paper-plane"></i>
+              Envoyer la demande
+            </button>
+          </form>
+        </div>
+      }
+    </article>
+
+    <aside class="board-panel">
+      <div class="board-card">
+        <div class="panel-top">
+          <span class="eyebrow">
+            <i class="fa-solid fa-inbox"></i>
+            Demandes
+          </span>
+          <span class="status-pill">{{ filteredRequests.length }} affichées</span>
+        </div>
+        <h2>Suivi par statut</h2>
+        <p class="panel-intro">
+          Les demandes sont regroupées par statut pour garder une lecture simple et rapide.
+        </p>
+      </div>
+
+      <div class="tab-row" role="tablist" aria-label="Filtres des demandes">
+        @for (tab of tabs; track tab.value) {
+          <button
+            type="button"
+            class="tab-btn"
+            [class.active]="activeTab === tab.value"
+            (click)="activeTab = tab.value"
+          >
+            <span>{{ tab.label }}</span>
+            <strong>{{ statusCounts[tab.value] }}</strong>
+          </button>
+        }
+      </div>
+
+      <div class="request-list">
+        @for (request of filteredRequests; track request.id) {
+          <article class="request-card">
+            <div class="request-icon">
+              <i class="fa-solid fa-shirt"></i>
+            </div>
+
+            <div class="request-copy">
+              <div class="request-head">
+                <div>
+                  <span class="mini-label">{{ statusLabel(request.status) }}</span>
+                  <small>{{ request.eventDateTime | date:'dd/MM/yyyy HH:mm' }}</small>
+                </div>
+                <span class="request-role">
+                  {{ viewerRole === 'STYLISTE' ? requestFashionistaDetails(request) : requestStylistMeta(request) }}
+                </span>
+              </div>
+
+              <h3>{{ request.eventType }}</h3>
+              <p>{{ request.description || 'Aucune description fournie.' }}</p>
+
+              <div class="tag-row">
+                <span>{{ request.dressCode }}</span>
+                <span>{{ request.theme }}</span>
+                <span>{{ request.formalityLevel }}</span>
+                <span>{{ request.season }}</span>
+              </div>
+
+              <div class="request-meta">
+                <span><i class="fa-solid fa-location-dot"></i> {{ request.place }}</span>
+                <span><i class="fa-solid fa-cloud-sun"></i> {{ request.weather }}</span>
+                <span><i class="fa-solid fa-user-tie"></i> {{ requestCounterpart(request) }}</span>
+              </div>
+
+              @if (viewerRole === 'STYLISTE' && request.status === 'PENDING') {
+                <div class="request-actions">
+                  <button type="button" class="btn action accept" (click)="acceptRequest(request.id)">
+                    <i class="fa-solid fa-circle-check"></i>
+                    Accepter
+                  </button>
+                  <button type="button" class="btn action refuse" (click)="refuseRequest(request.id)">
+                    <i class="fa-solid fa-circle-xmark"></i>
+                    Refuser
+                  </button>
+                </div>
+              }
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-state">
+            <i class="fa-solid fa-envelope-open-text"></i>
+            <strong>Aucune demande dans cet onglet.</strong>
+            <span>
+              @if (showCreateForm) {
+                Tu peux créer un nouveau brief quand tu veux.
+              } @else {
+                Aucune demande ne correspond encore à ce statut.
+              }
+            </span>
+          </div>
+        }
+      </div>
+    </aside>
+  </section>
+</main>
