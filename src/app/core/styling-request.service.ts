@@ -7,6 +7,10 @@ import { environment } from '../../environments/environment';
 export interface StylingRequestUserRef {
   id?: number;
   userId?: number;
+  user?: {
+    id: number;
+    email?: string;
+  };
   email?: string;
   nom?: string;
   prenom?: string;
@@ -29,7 +33,8 @@ export interface StylingRequest {
   theme: string;
   formalityLevel: string;
   description?: string;
-  status: 'PENDING' | 'ACCEPTED' | 'REFUSED' | string;
+  status: 'PENDING' | 'ACCEPTED' | 'REFUSED' | 'DONE' | string;
+  completedAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -74,5 +79,9 @@ export class StylingRequestService {
 
   refuseStylingRequest(requestId: number): Observable<StylingRequest> {
     return this.http.post<StylingRequest>(`${this.apiUrl}/${requestId}/refuse`, {});
+  }
+
+  markStylingRequestAsDone(requestId: number): Observable<StylingRequest> {
+    return this.http.post<StylingRequest>(`${this.apiUrl}/${requestId}/done`, {});
   }
 }

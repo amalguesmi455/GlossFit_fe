@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
   title = 'Glossfit';
   showNavbar = true;
 
-  private readonly navbarHiddenRoutes = ['/signin', '/signup', '/verify-email'];
+  private readonly navbarHiddenRoutes = ['/signin', '/signup', '/verify-email', '/reset-password'];
 
   constructor(private router: Router) {}
 

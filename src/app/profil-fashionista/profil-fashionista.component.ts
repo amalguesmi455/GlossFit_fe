@@ -9,6 +9,13 @@ import { FashionistaProfileService, FashionistaProfile, FashionistaProfileData }
 import { AuthService } from '../core/auth/auth.service';
 import { environment } from '../../environments/environment';
 
+type ProfileChoice = {
+  label: string;
+  value: string;
+  icon?: string;
+  color?: string;
+};
+
 @Component({
   selector: 'app-profil-fashionista',
   standalone: true,
@@ -32,6 +39,37 @@ export class ProfilFashionistaComponent implements OnInit, OnDestroy {
   isEditing = false;
 
   draft: FashionistaProfileData = this.emptyDraft();
+
+  readonly tailles: ProfileChoice[] = [
+    { label: 'Petite', value: 'petite' },
+    { label: 'Moyenne', value: 'moyenne' },
+    { label: 'Grande', value: 'grande' },
+  ];
+
+  readonly skinTones: ProfileChoice[] = [
+    { label: 'Clair', value: 'clair', icon: 'fa-solid fa-circle', color: '#fdbcb4' },
+    { label: 'Moyen', value: 'moyen', icon: 'fa-solid fa-circle', color: '#c19a6b' },
+    { label: 'Foncé', value: 'fonce', icon: 'fa-solid fa-circle', color: '#4a4a4a' },
+  ];
+
+  readonly morphologies: ProfileChoice[] = [
+    { label: 'Sablier', value: 'sablier', icon: 'fa-solid fa-hourglass-end' },
+    { label: 'Poire', value: 'poire', icon: 'fa-solid fa-apple-whole' },
+    { label: 'Rectangle', value: 'rectangle', icon: 'fa-solid fa-square' },
+    { label: 'Triangle inversé', value: 'triangle_inverse', icon: 'fa-solid fa-caret-up' },
+    { label: 'Ronde', value: 'ronde', icon: 'fa-solid fa-circle' },
+    { label: 'Ovale', value: 'ovale', icon: 'fa-solid fa-egg' },
+    { label: 'Diamant', value: 'diamant', icon: 'fa-solid fa-gem' },
+    { label: 'Athlétique', value: 'athletique', icon: 'fa-solid fa-dumbbell' },
+    { label: 'Fine', value: 'fine', icon: 'fa-solid fa-minus' },
+    { label: 'Pulpeuse', value: 'pulpeuse', icon: 'fa-solid fa-heart' },
+  ];
+
+  readonly styleOptions: ProfileChoice[] = [
+    { label: 'Classique', value: 'classique', icon: 'fa-solid fa-shirt' },
+    { label: 'Casual', value: 'casual', icon: 'fa-solid fa-tshirt' },
+    { label: 'Chic', value: 'chic', icon: 'fa-solid fa-crown' },
+  ];
 
   private userId!: number;
 
@@ -117,6 +155,8 @@ export class ProfilFashionistaComponent implements OnInit, OnDestroy {
       raw['pictureUrl']             ??
       raw['imageUrl']               ??
       raw['photoUrl']               ??
+      raw['profileImageUrl']        ??
+      raw['profile_image_url']      ??
       raw['avatarUrl']              ??
       null;
 
@@ -128,13 +168,14 @@ export class ProfilFashionistaComponent implements OnInit, OnDestroy {
     // Build absolute URL
     // If value is a bare filename (no slashes), prepend /uploads/
     // If value is already a path like /uploads/file.png, use it directly
-    const isAbsolute = value.startsWith('http');
+    const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+    const isAbsolute = /^(https?:)?\/\//.test(value);
     const isPath     = value.includes('/');
     const url = isAbsolute
       ? value
       : isPath
-        ? `${environment.apiUrl}/${value.replace(/^\//, '')}`
-        : `${environment.apiUrl}/uploads/${value}`;
+        ? `${baseUrl}/${value.replace(/^\/+/, '')}`
+        : `${baseUrl}/uploads/profiles/${encodeURIComponent(value)}`;
 
     console.log('[Avatar] fetching from URL:', url);
 
@@ -173,6 +214,10 @@ export class ProfilFashionistaComponent implements OnInit, OnDestroy {
   get avatarInitial(): string {
     if (!this.profile) return '?';
     return `${this.profile.prenom} ${this.profile.nom}`.trim().charAt(0).toUpperCase();
+  }
+
+  getSkintoneColor(value: string): string {
+    return this.skinTones.find((tone) => tone.value === value)?.color || '#000';
   }
 
   // ── Edit mode toggle ───────────────────────────────────────────────────────

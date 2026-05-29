@@ -20,6 +20,12 @@ export interface FashionistaProfile extends FashionistaProfileData {
   id?: number;
   userId: number;
   createdAt?: string;
+  active?: boolean;
+  user?: {
+    id?: number;
+    email?: string;
+    active?: boolean;
+  };
 }
 
 @Injectable({
@@ -43,12 +49,25 @@ export class FashionistaProfileService {
     return this.http.put<FashionistaProfile>(`${this.apiUrl}/${userId}`, this.toFormData(profileData));
   }
 
+  updateAccountStatus(profile: FashionistaProfile, active: boolean, userId?: number): Observable<FashionistaProfile> {
+    const resolvedUserId = userId ?? profile.userId ?? profile.user?.id;
+
+    if (!resolvedUserId) {
+      throw new Error('User ID missing.');
+    }
+
+    return this.http.put<FashionistaProfile>(
+      `${this.apiUrl}/${resolvedUserId}`,
+      this.toFormData(profile, resolvedUserId, active)
+    );
+  }
+
   deleteProfile(userId: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${userId}`);
   }
 
   // ── Private helpers ─────────────────────────────────────────────────────────
-  private toFormData(data: FashionistaProfileData, userId?: number): FormData {
+  private toFormData(data: FashionistaProfileData, userId?: number, active?: boolean): FormData {
     const fd = new FormData();
     fd.append('nom',         data.nom);
     fd.append('prenom',      data.prenom);
@@ -61,6 +80,10 @@ export class FashionistaProfileService {
 
     if (userId != null) {
       fd.append('userId', userId.toString());
+    }
+
+    if (active != null) {
+      fd.append('active', String(active));
     }
 
     // Only append when a new File is provided — skip if it's a string (existing URL) or null

@@ -1,9 +1,9 @@
 <main class="page admin-page">
   <section class="admin-hero">
     <div>
-      <span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Admin profiles</span>
+      <span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Admin profile</span>
       <h1>Gestion des profils</h1>
-      <p>Consulte les fashionistas et stylistes, puis gere le profil administrateur depuis les endpoints admin.</p>
+      <p>Consulte les fashionistas et stylistes, puis gère leurs profils selon votre accès admin.</p>
     </div>
 
     <button class="btn primary refresh-btn" type="button" (click)="loadProfiles()" [disabled]="isLoading" title="Rafraichir">
@@ -20,7 +20,7 @@
     <section class="panel directory-panel">
       <div class="panel-head">
         <div>
-          <h2>{{ activeTab === 'admins' ? 'Admins' : 'Profils utilisateurs' }}</h2>
+          <h2>{{ activeTab === 'admins' ? 'Admins' : 'Gèrer les profils' }}</h2>
           <p>{{ activeCount }} profil(s) charge(s)</p>
         </div>
 
@@ -36,12 +36,6 @@
             [class.active]="activeTab === 'stylistes'"
             (click)="switchTab('stylistes'); loadProfiles()">
             Stylistes
-          </button>
-          <button
-            type="button"
-            [class.active]="activeTab === 'admins'"
-            (click)="switchTab('admins'); loadProfiles()">
-            Admins
           </button>
         </div>
       </div>
@@ -98,23 +92,38 @@
 
       <div class="profile-table" *ngIf="activeTab !== 'admins' && activeProfiles.length; else adminOrEmptyState">
         <article class="profile-row" *ngFor="let profile of activeProfiles">
-          <div class="avatar">
-            {{ (profile.prenom || profile.nom || '?').charAt(0).toUpperCase() }}
+          <div class="avatar profile-avatar" [class.has-image]="!!profilePictureUrl(profile)">
+            <img *ngIf="profilePictureUrl(profile); else profileLetters" [src]="profilePictureUrl(profile)" [alt]="profileName(profile)">
+            <ng-template #profileLetters>
+              {{ profileInitials(profile) }}
+            </ng-template>
           </div>
 
           <div class="profile-main">
-            <strong>{{ profileName(profile) }}</strong>
-            <span>{{ profile.ville || 'Ville non renseignee' }}</span>
+            <strong>{{ profile.nom }}</strong>
+            <span>{{ profile.prenom }}</span>
           </div>
 
           <div class="profile-meta">
-            <span>{{ profile.style || 'Style libre' }}</span>
-            <small *ngIf="activeTab === 'fashionistas'">
-              {{ $any(profile).morphologie || 'Morphologie non renseignee' }}
+            <span>{{ profileEmail(profile) }}</span>
+            <small class="status-chip" [class.active]="isProfileActive(profile)" [class.inactive]="!isProfileActive(profile)">
+              <i class="fa-solid" [class.fa-circle-check]="isProfileActive(profile)" [class.fa-circle-xmark]="!isProfileActive(profile)"></i>
+              {{ profileStatusLabel(profile) }}
             </small>
-            <small *ngIf="activeTab === 'stylistes'">
-              {{ $any(profile).stylistSpecialty || 'Specialite non renseignee' }}
-            </small>
+          </div>
+
+          <div class="row-actions">
+            <button
+              class="status-toggle"
+              type="button"
+              [class.active]="isProfileActive(profile)"
+              [class.inactive]="!isProfileActive(profile)"
+              [disabled]="isSaving"
+              [title]="profileStatusTitle(profile)"
+              (click)="activeTab === 'fashionistas' ? toggleFashionistaStatus($any(profile)) : toggleStylisteStatus($any(profile))"
+            >
+              <i class="fa-solid" [class.fa-circle]="isProfileActive(profile)" [class.fa-circle-xmark]="!isProfileActive(profile)"></i>
+            </button>
           </div>
         </article>
       </div>

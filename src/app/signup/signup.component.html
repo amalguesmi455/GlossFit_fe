@@ -6,7 +6,7 @@
 
   <section class="auth-layout">
     <section class="auth-copy" aria-labelledby="signup-title">
-      <span class="eyebrow"><i class="fa-solid fa-sparkles"></i> Création de compte</span>
+      <span class="eyebrow"><i class="fa-solid fa-user"></i> Création de compte</span>
       <h1 id="signup-title">Rejoins GlossFit.</h1>
       <p class="lead">Crée ton compte en quelques secondes et choisis ton rôle pour une expérience sur mesure.</p>
 
@@ -45,14 +45,9 @@
       <form class="form" (ngSubmit)="signup()" novalidate>
         <input type="hidden" name="role" [(ngModel)]="account.role">
 
-        <label class="field" for="name">
-          <span>Nom complet</span>
-          <input id="name" name="name" [(ngModel)]="account.name" required placeholder="Amal Guesmi" autocomplete="name">
-        </label>
-
         <label class="field" for="email">
           <span>Adresse email</span>
-          <input id="email" name="email" type="email" [(ngModel)]="account.email" required placeholder="amal@email.com" autocomplete="email">
+          <input id="email" name="email" type="email" [(ngModel)]="account.email" required placeholder="amal@gmail.com" autocomplete="email">
         </label>
 
         <label class="field" for="password">

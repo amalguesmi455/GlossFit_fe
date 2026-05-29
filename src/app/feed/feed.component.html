@@ -1,1 +1,215 @@
-<p>feed works!</p>
+<main class="feed-page">
+  <section class="feed-shell">
+    <header class="feed-header">
+      <div class="feed-heading">
+        <span class="eyebrow"><i class="fa-solid fa-layer-group"></i> Feed</span>
+        <h1>{{ pageTitle }}</h1>
+        <p>{{ pageSubtitle }}</p>
+      </div>
+
+      <button *ngIf="isStyliste" class="create-btn" type="button" (click)="openCreateModal()">
+        <i class="fa-solid fa-plus"></i>
+        <span>Nouveau post</span>
+      </button>
+    </header>
+
+    <section class="filter-bar" aria-label="Filtres du feed">
+      <label class="filter-field">
+        <span>Trier</span>
+        <select [(ngModel)]="filters.sortBy">
+          <option value="recent">Plus recent</option>
+          <option value="old">Plus ancien</option>
+          <option value="likes">Plus de likes</option>
+          <option value="dislikes">Plus de dislikes</option>
+        </select>
+      </label>
+
+      <label class="filter-field">
+        <span>Style</span>
+        <select [(ngModel)]="filters.style">
+          <option value="all">Tous les styles</option>
+          <option *ngFor="let style of availableStyles" [value]="style">{{ style }}</option>
+        </select>
+      </label>
+
+      <label class="filter-field">
+        <span>Tag</span>
+        <select [(ngModel)]="filters.tag">
+          <option value="all">Tous les tags</option>
+          <option *ngFor="let tag of availableTags" [value]="tag">{{ tag }}</option>
+        </select>
+      </label>
+
+      <label class="filter-field" *ngIf="isFashionista">
+        <span>Etat</span>
+        <select [(ngModel)]="filters.reaction">
+          <option value="all">Tous les posts</option>
+          <option value="liked">Posts aimés</option>
+          <option value="disliked">Posts non aimés</option>
+        </select>
+      </label>
+
+      <label class="filter-field wide" *ngIf="isFashionista">
+        <span>Styliste</span>
+        <select [(ngModel)]="filters.stylistName">
+          <option value="">Tous les stylistes</option>
+          <option *ngFor="let styliste of availableStylisteNames" [value]="styliste">{{ styliste }}</option>
+        </select>
+      </label>
+
+      <button class="reset-btn" type="button" (click)="clearFilters()">Reinitialiser</button>
+    </section>
+
+    <section class="feed-summary">
+      <span>{{ visiblePosts.length }} post{{ visiblePosts.length > 1 ? 's' : '' }}</span>
+      <span *ngIf="isStyliste">Tes publications seulement</span>
+      <span *ngIf="isFashionista">Tous les posts du site</span>
+    </section>
+
+    <section *ngIf="loading" class="state-panel">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <span>Chargement du feed...</span>
+    </section>
+
+    <section *ngIf="!loading && visiblePosts.length === 0" class="state-panel empty">
+      <i class="fa-regular fa-images"></i>
+      <span>Aucun post pour ces filtres.</span>
+    </section>
+
+    <section *ngIf="!loading && visiblePosts.length > 0" class="posts-grid">
+      <article class="post-card" *ngFor="let post of visiblePosts; trackBy: trackByPostId">
+        <div class="post-media">
+          <img [src]="postImage(post)" [alt]="post.title">
+          <span class="post-badge">{{ post.style }}</span>
+        </div>
+
+        <div class="post-body">
+          <div class="post-topline">
+            <div>
+              <p class="post-author">{{ post.stylisteName }}</p>
+              <h2>{{ post.title }}</h2>
+            </div>
+            <span class="post-date">{{ post.createdAt | date:'dd MMM yyyy' }}</span>
+          </div>
+
+          <p class="post-description">{{ post.description }}</p>
+
+          <div class="tag-list" *ngIf="post.tags.length > 0">
+            <span class="tag-pill" *ngFor="let tag of post.tags">{{ tag }}</span>
+          </div>
+
+          <div class="post-footer">
+            <div class="reaction-counts">
+              <span><i class="fa-solid fa-heart"></i>{{ post.nbrLikes }}</span>
+              <span><i class="fa-solid fa-heart-circle-xmark"></i>{{ post.nbrDislikes }}</span>
+            </div>
+
+            <div class="reaction-actions" *ngIf="isFashionista">
+              <button
+                class="reaction-btn like"
+                type="button"
+                [class.active]="post.myReaction === 'LIKE'"
+                [disabled]="reactingPostIds.has(post.postId)"
+                (click)="likePost(post)"
+              >
+                <span>{{ post.myReaction === 'LIKE' ? 'Vibed' : 'Vibe' }}</span>
+              </button>
+
+              <button
+                class="reaction-btn dislike"
+                type="button"
+                [class.active]="post.myReaction === 'DISLIKE'"
+                [disabled]="reactingPostIds.has(post.postId)"
+                (click)="dislikePost(post)"
+              >
+                <span>{{ post.myReaction === 'DISLIKE' ? 'No vibe ✕' : 'No vibe' }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+  </section>
+
+  <div class="modal-backdrop" *ngIf="showCreateModal" (click)="closeCreateModal()">
+    <section class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-head">
+        <div>
+          <span class="eyebrow"><i class="fa-solid fa-pen-to-square"></i> Nouveau post</span>
+          <h2>Créer une publication</h2>
+        </div>
+
+        <button class="icon-close" type="button" aria-label="Fermer" (click)="closeCreateModal()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+
+      <form class="modal-form" (ngSubmit)="submitPost()" novalidate>
+        <label class="field">
+          <span>Titre</span>
+          <input type="text" [(ngModel)]="draft.title" name="title" placeholder="Titre du post" required>
+        </label>
+
+        <label class="field">
+          <span>Style</span>
+          <select [(ngModel)]="draft.style" name="style" required>
+            <option value="">Choisir un style</option>
+            <option *ngFor="let style of postStyles" [value]="style">{{ style }}</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Image</span>
+          <input type="file" accept="image/*" (change)="onImageSelected($event)" required>
+        </label>
+
+        <div class="image-preview" *ngIf="draft.imagePreview">
+          <img [src]="draft.imagePreview" alt="Aperçu du post">
+        </div>
+
+        <label class="field">
+          <span>Description</span>
+          <textarea
+            rows="4"
+            [(ngModel)]="draft.description"
+            name="description"
+            placeholder="Décris l intention du look"
+            required
+          ></textarea>
+        </label>
+
+        <div class="tag-builder">
+          <label class="field tag-input-field">
+            <span>Tags</span>
+            <input
+              type="text"
+              [(ngModel)]="draft.tagInput"
+              name="tagInput"
+              placeholder="Ajouter un tag puis Entrée"
+              (keydown.enter)="$event.preventDefault(); addTagFromDraft()"
+            >
+          </label>
+
+          <button class="add-tag-btn" type="button" (click)="addTagFromDraft()">Ajouter</button>
+        </div>
+
+        <div class="chip-list" *ngIf="draft.tags.length > 0">
+          <span class="chip" *ngFor="let tag of draft.tags">
+            {{ tag }}
+            <button type="button" (click)="removeDraftTag(tag)" aria-label="Supprimer le tag">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </span>
+        </div>
+
+        <footer class="modal-actions">
+          <button class="secondary-btn" type="button" (click)="closeCreateModal()">Annuler</button>
+          <button class="primary-btn" type="submit" [disabled]="savingPost">
+            <i class="fa-solid fa-paper-plane"></i>
+            {{ savingPost ? 'Publication...' : 'Publier' }}
+          </button>
+        </footer>
+      </form>
+    </section>
+  </div>
+</main>

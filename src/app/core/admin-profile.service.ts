@@ -64,16 +64,20 @@ export class AdminProfileService {
     return this.http.delete<ApiMessage>(`${this.apiUrl}/${profileId}`);
   }
 
-  getAllFashionistas(adminId: number): Observable<FashionistaProfile[]> {
-    return this.http.get<FashionistaProfile[]>(`${this.apiUrl}/fashionistas`, {
-      params: new HttpParams().set('adminId', adminId),
-    });
+  getAllFashionistas(adminId?: number | null): Observable<FashionistaProfile[]> {
+    const options = adminId != null
+      ? { params: new HttpParams().set('adminId', adminId) }
+      : undefined;
+
+    return this.http.get<FashionistaProfile[]>(`${this.apiUrl}/fashionistas`, options);
   }
 
-  getAllStylistes(adminId: number): Observable<StylisteProfile[]> {
-    return this.http.get<StylisteProfile[]>(`${this.apiUrl}/stylistes`, {
-      params: new HttpParams().set('adminId', adminId),
-    });
+  getAllStylistes(adminId?: number | null): Observable<StylisteProfile[]> {
+    const options = adminId != null
+      ? { params: new HttpParams().set('adminId', adminId) }
+      : undefined;
+
+    return this.http.get<StylisteProfile[]>(`${this.apiUrl}/stylistes`, options);
   }
 
   private toParams(source: Partial<AdminProfileData>): HttpParams {

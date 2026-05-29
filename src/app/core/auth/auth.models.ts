@@ -10,6 +10,7 @@ export interface AuthResponse {
   role: UserRole | string;
   hasProfile?: boolean;
   has_profile?: boolean;
+  active?: boolean;
 }
 
 export interface SignInRequest {
@@ -21,6 +22,25 @@ export interface RegisterRequest {
   email: string;
   password: string;
   role: RegisterRole;
+}
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ApiMessage {
+  message?: string;
+  error?: string;
 }
 
 export interface AuthUser {

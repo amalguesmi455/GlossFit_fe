@@ -1,35 +1,80 @@
 <main class="page home-page">
-  <section class="shell hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Plateforme style sur mesure</p>
-      <h1>Glossfit</h1>
-      <p class="lead">
-        Organise ton dressing, precise ton besoin et collabore avec un styliste pour composer
-        des looks coherents avec ton quotidien.
-      </p>
-      <div class="actions">
-        <a class="btn" routerLink="/signup">Commencer</a>
-        <a class="btn-ghost" routerLink="/demand">Faire une demande</a>
+  @if (isLoggedIn) {
+    <section class="dashboard-shell">
+      <div class="dashboard-copy">
+        <p class="eyebrow">Tableau de bord</p>
+        <h1>{{ dashboardTitle }}</h1>
+        <p class="lead">
+          {{ dashboardLead }}
+        </p>
       </div>
-    </div>
 
-    <div class="look-board" aria-label="Apercu style">
-      <div class="fabric tall"></div>
-      <div class="fabric mid"></div>
-      <div class="fabric small"></div>
-      <div class="note">
-        <strong>Look capsule</strong>
-        <span>minimal, chic, adaptable</span>
+      <aside class="dashboard-panel" aria-label="Aperçu du compte">
+        <span class="panel-eyebrow">Compte connecté</span>
+        <strong>{{ roleLabel }}</strong>
+        <p *ngIf="dashboardStats">
+          Les statistiques ci-dessous reflètent l’activité globale de ton espace.
+        </p>
+        <p *ngIf="!dashboardStats && !dashboardError && loadingDashboard">
+          Synchronisation des données en cours...
+        </p>
+      </aside>
+    </section>
+
+    <section class="stats-grid" aria-label="Statistiques du tableau de bord">
+      @for (card of dashboardCards; track card.label) {
+        <article class="stat-card" [ngClass]="card.tone">
+          <div class="stat-icon">
+            <i [class]="card.icon"></i>
+          </div>
+          <div class="stat-copy">
+            <span>{{ card.label }}</span>
+            <strong>{{ card.value | number:'1.0-0' }}</strong>
+          </div>
+        </article>
+      }
+    </section>
+
+    <section class="dashboard-note" *ngIf="dashboardError || loadingDashboard">
+      @if (dashboardError) {
+        <p class="error-note">{{ dashboardError }}</p>
+      } @else {
+        <p>Les chiffres sont en cours de chargement. Patiente quelques secondes.</p>
+      }
+    </section>
+  } @else {
+    <section class="shell hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Plateforme style sur mesure</p>
+        <h1>Glossfit</h1>
+        <p class="lead">
+          Organise ton dressing, precise ton besoin et collabore avec un styliste pour composer
+          des looks coherents avec ton quotidien.
+        </p>
+        <div class="actions">
+          <a class="btn" routerLink="/signup">Commencer</a>
+          <a class="btn-ghost" routerLink="/styling-request">Faire une demande</a>
+        </div>
       </div>
-    </div>
-  </section>
 
-  <section class="shell grid three">
-    @for (service of services; track service) {
-      <article class="card">
-        <h3>{{ service }}</h3>
-        <p class="muted">Une interface simple pour consulter, ajouter, modifier et supprimer les informations utiles.</p>
-      </article>
-    }
-  </section>
+      <div class="look-board" aria-label="Apercu style">
+        <div class="fabric tall"></div>
+        <div class="fabric mid"></div>
+        <div class="fabric small"></div>
+        <div class="note">
+          <strong>Look capsule</strong>
+          <span>minimal, chic, adaptable</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="shell grid three">
+      @for (service of services; track service) {
+        <article class="card">
+          <h3>{{ service }}</h3>
+          <p class="muted">Une interface simple pour consulter, ajouter, modifier et supprimer les informations utiles.</p>
+        </article>
+      }
+    </section>
+  }
 </main>
