@@ -113,6 +113,10 @@ export class NavbarComponent implements OnInit {
   }
 
   get profileRoute(): string {
+    if (this.user.role === 'ADMIN') {
+      return '/adminDashbord';
+    }
+
     return this.user.role === 'STYLISTE'
       ? `/profilestyliste/${this.user.id}`
       : `/profilefashionista/${this.user.id}`;
@@ -123,7 +127,21 @@ export class NavbarComponent implements OnInit {
   }
 
   get displayRole(): string {
-    return this.user.role === 'STYLISTE' ? 'Styliste' : 'Fashionista';
+    const labels: Record<UserRole, string> = {
+      ADMIN: 'Admin',
+      FASHIONISTA: 'Fashionista',
+      STYLISTE: 'Styliste',
+    };
+
+    return labels[this.user.role] ?? 'Utilisateur';
+  }
+
+  get isAdmin(): boolean {
+    return this.user.role === 'ADMIN';
+  }
+
+  get isFashionista(): boolean {
+    return this.user.role === 'FASHIONISTA';
   }
 
   private applyAuthUser(authUser: AuthUser | null): void {
@@ -136,9 +154,19 @@ export class NavbarComponent implements OnInit {
     this.user = {
       name: authUser.email.split('@')[0] || 'GlossFit',
       avatar: this.getInitials(authUser.email),
-      role: authUser.role,
+      role: this.normalizeRole(authUser.role),
       id: authUser.id,
     };
+  }
+
+  private normalizeRole(role: string): UserRole {
+    const normalized = String(role || '').replace(/^ROLE_/, '').toUpperCase();
+
+    if (normalized === 'ADMIN' || normalized === 'STYLISTE') {
+      return normalized;
+    }
+
+    return 'FASHIONISTA';
   }
 
   private getInitials(value: string): string {

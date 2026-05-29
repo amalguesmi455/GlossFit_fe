@@ -1,1 +1,160 @@
-<p>admin-dashbord works!</p>
+<main class="page admin-page">
+  <section class="admin-hero">
+    <div>
+      <span class="eyebrow"><i class="fa-solid fa-shield-halved"></i> Admin profiles</span>
+      <h1>Gestion des profils</h1>
+      <p>Consulte les fashionistas et stylistes, puis gere le profil administrateur depuis les endpoints admin.</p>
+    </div>
+
+    <button class="btn primary refresh-btn" type="button" (click)="loadProfiles()" [disabled]="isLoading" title="Rafraichir">
+      <i class="fa-solid fa-rotate"></i>
+      <span>{{ isLoading ? '...' : 'Refresh' }}</span>
+    </button>
+  </section>
+
+  <p class="status" *ngIf="message" role="status">
+    <i class="fa-solid fa-circle-info"></i>{{ message }}
+  </p>
+
+  <section class="admin-grid">
+    <section class="panel directory-panel">
+      <div class="panel-head">
+        <div>
+          <h2>{{ activeTab === 'admins' ? 'Admins' : 'Profils utilisateurs' }}</h2>
+          <p>{{ activeCount }} profil(s) charge(s)</p>
+        </div>
+
+        <div class="tab-group" role="tablist" aria-label="Profils">
+          <button
+            type="button"
+            [class.active]="activeTab === 'fashionistas'"
+            (click)="switchTab('fashionistas'); loadProfiles()">
+            Fashionistas
+          </button>
+          <button
+            type="button"
+            [class.active]="activeTab === 'stylistes'"
+            (click)="switchTab('stylistes'); loadProfiles()">
+            Stylistes
+          </button>
+          <button
+            type="button"
+            [class.active]="activeTab === 'admins'"
+            (click)="switchTab('admins'); loadProfiles()">
+            Admins
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-toolbar" *ngIf="activeTab === 'admins'">
+        <div>
+          <strong>Gestion admin</strong>
+          <span>Ajoute, modifie ou supprime un profil administrateur.</span>
+        </div>
+        <button class="btn primary compact-btn" type="button" (click)="resetAdminForm()">
+          <i class="fa-solid fa-plus"></i>
+          Ajouter
+        </button>
+      </div>
+
+      <form class="form inline-admin-form" *ngIf="activeTab === 'admins' && showAdminForm" (ngSubmit)="saveAdminProfile()" novalidate>
+        <div class="form-title">
+          <strong>{{ selectedAdminProfile?.id ? 'Modifier admin' : 'Nouvel admin' }}</strong>
+          <span>{{ selectedAdminProfile?.id ? 'Mets a jour les informations du profil.' : 'Cree un profil admin pour un utilisateur existant.' }}</span>
+        </div>
+
+        <label class="field" for="userId">
+          <span>User ID</span>
+          <input id="userId" name="userId" type="number" min="1" [(ngModel)]="adminForm.userId" [disabled]="!!selectedAdminProfile?.id" required>
+        </label>
+
+        <div class="field-row">
+          <label class="field" for="firstName">
+            <span>Prenom</span>
+            <input id="firstName" name="firstName" [(ngModel)]="adminForm.firstName" required placeholder="Amal">
+          </label>
+
+          <label class="field" for="lastName">
+            <span>Nom</span>
+            <input id="lastName" name="lastName" [(ngModel)]="adminForm.lastName" required placeholder="Guesmi">
+          </label>
+        </div>
+
+        <label class="field" for="phoneNumber">
+          <span>Telephone</span>
+          <input id="phoneNumber" name="phoneNumber" [(ngModel)]="adminForm.phoneNumber" required placeholder="+21612345678">
+        </label>
+
+        <div class="btn-row">
+          <button class="btn secondary" type="button" (click)="showAdminForm = false">
+            Annuler
+          </button>
+          <button class="btn primary" type="submit" [disabled]="isSaving || !adminForm.userId">
+            <i class="fa-solid fa-floppy-disk"></i>
+            {{ selectedAdminProfile?.id ? 'Enregistrer' : 'Creer' }}
+          </button>
+        </div>
+      </form>
+
+      <div class="profile-table" *ngIf="activeTab !== 'admins' && activeProfiles.length; else adminOrEmptyState">
+        <article class="profile-row" *ngFor="let profile of activeProfiles">
+          <div class="avatar">
+            {{ (profile.prenom || profile.nom || '?').charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="profile-main">
+            <strong>{{ profileName(profile) }}</strong>
+            <span>{{ profile.ville || 'Ville non renseignee' }}</span>
+          </div>
+
+          <div class="profile-meta">
+            <span>{{ profile.style || 'Style libre' }}</span>
+            <small *ngIf="activeTab === 'fashionistas'">
+              {{ $any(profile).morphologie || 'Morphologie non renseignee' }}
+            </small>
+            <small *ngIf="activeTab === 'stylistes'">
+              {{ $any(profile).stylistSpecialty || 'Specialite non renseignee' }}
+            </small>
+          </div>
+        </article>
+      </div>
+
+      <ng-template #adminOrEmptyState>
+        <div class="profile-table" *ngIf="activeTab === 'admins' && adminProfiles.length; else emptyState">
+          <article class="profile-row admin-row" *ngFor="let profile of adminProfiles">
+            <div class="avatar">
+              {{ (profile.firstName || profile.lastName || '?').charAt(0).toUpperCase() }}
+            </div>
+
+            <div class="profile-main">
+              <strong>{{ adminName(profile) }}</strong>
+              <span>{{ profile.user?.email || 'User ID: ' + (profile.userId || profile.user?.id || '-') }}</span>
+            </div>
+
+            <div class="profile-meta">
+              <span>{{ profile.phoneNumber || 'Telephone non renseigne' }}</span>
+              <small>Profil #{{ profile.id || '-' }}</small>
+            </div>
+
+            <div class="row-actions">
+              <button class="icon-btn" type="button" (click)="editAdminProfile(profile)" title="Modifier">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="icon-btn danger-icon" type="button" (click)="removeAdminProfile(profile)" [disabled]="isSaving" title="Supprimer">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </article>
+        </div>
+      </ng-template>
+
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <i class="fa-solid fa-users"></i>
+          <strong>Aucun profil a afficher</strong>
+          <span>Utilise le bouton de rafraichissement ou change d'onglet.</span>
+        </div>
+      </ng-template>
+    </section>
+  </section>
+</main>

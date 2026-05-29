@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { StylisteProfileService } from '../core/styliste-profile.service';
 
 @Component({
   selector: 'app-create-profile-styliste',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './create-profile-styliste.component.html',
   styleUrls: ['./create-profile-styliste.component.css']
 })
@@ -33,13 +34,13 @@ export class CreateProfileStylisteComponent implements OnInit {
     { label: 'Couleurs & contrastes', value: 'couleurs', icon: 'fa-solid fa-palette' },
     { label: 'Shopping', value: 'shopping', icon: 'fa-solid fa-bag-shopping' },
     { label: 'Garde-robe', value: 'garde-robe', icon: 'fa-solid fa-closet' },
-    { label: 'Événementiel', value: 'evenementiel', icon: 'fa-solid fa-champagne-glasses' }
+    { label: 'Evenementiel', value: 'evenementiel', icon: 'fa-solid fa-champagne-glasses' }
   ];
 
   styleOptions = [
     { label: 'Classique', value: 'classique', icon: 'fa-solid fa-vest' },
     { label: 'Casual', value: 'casual', icon: 'fa-solid fa-shirt' },
-    { label: 'Bohème', value: 'boheme', icon: 'fa-solid fa-leaf' },
+    { label: 'Boheme', value: 'boheme', icon: 'fa-solid fa-leaf' },
     { label: 'Sportif', value: 'sportif', icon: 'fa-solid fa-dumbbell' },
     { label: 'Tendance', value: 'tendance', icon: 'fa-solid fa-star' },
     { label: 'Chic', value: 'chic', icon: 'fa-solid fa-crown' }
@@ -114,7 +115,7 @@ export class CreateProfileStylisteComponent implements OnInit {
     }
 
     if (!this.formData.stylistSpecialty || !this.formData.style) {
-      this.message = 'Erreur: Veuillez sélectionner votre spécialité et style';
+      this.message = 'Erreur: Veuillez selectionner votre specialite et style';
       console.log('[v0] Final validation failed - missing specialty or style');
       return;
     }
@@ -126,7 +127,7 @@ export class CreateProfileStylisteComponent implements OnInit {
     }
 
     if (!this.userId) {
-      this.message = 'Erreur: Impossible de récupérer votre ID utilisateur';
+      this.message = 'Erreur: Impossible de recuperer votre ID utilisateur';
       console.log('[v0] Cannot submit - userId is missing');
       return;
     }
@@ -138,7 +139,7 @@ export class CreateProfileStylisteComponent implements OnInit {
       next: (response: any) => {
         console.log('[v0] Profile created successfully:', response);
         this.isLoading = false;
-        this.message = 'Profil créé avec succès!';
+        this.message = 'Profil cree avec succes!';
         // Redirection après succès
         setTimeout(() => {
           // TODO: Ajouter navigation vers dashboard
@@ -147,7 +148,7 @@ export class CreateProfileStylisteComponent implements OnInit {
       error: (error: any) => {
         console.log('[v0] Error creating profile:', error);
         this.isLoading = false;
-        this.message = 'Erreur: ' + (error?.error?.message || 'Impossible de créer le profil');
+        this.message = 'Erreur: ' + (error?.error?.message || 'Impossible de creer le profil');
       }
     });
   }

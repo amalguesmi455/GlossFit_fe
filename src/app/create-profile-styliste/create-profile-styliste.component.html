@@ -1,19 +1,18 @@
 <main class="page auth-page create-profile-page">
   <header class="auth-topbar">
     <a class="brand-link" routerLink="/"><span>G</span>GlossFit</a>
-    <a class="topbar-link" routerLink="/signin">Déjà membre</a>
+    <a class="topbar-link" routerLink="/signin">Deja membre</a>
   </header>
 
   <section class="auth-layout profile-layout">
     <section class="auth-copy" aria-labelledby="profile-title">
       <span class="eyebrow"><i class="fa-solid fa-scissors"></i> Styliste</span>
       <h1 id="profile-title">Ton profil expert.</h1>
-      <p class="lead">Présente ton univers et attire les fashionistas qui te correspondent.</p>
+      <p class="lead">Presente ton univers et attire les fashionistas qui te correspondent.</p>
 
-      <!-- Step indicator -->
       <div class="steps">
         <span class="step" [class.active]="currentStep === 1" [class.done]="currentStep > 1">
-          <i class="fa-solid fa-user"></i> Identité
+          <i class="fa-solid fa-user"></i> Identite
         </span>
         <span class="step-sep"><i class="fa-solid fa-chevron-right"></i></span>
         <span class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2">
@@ -25,31 +24,36 @@
         </span>
       </div>
 
-      <form class="form" (ngSubmit)="submit()" novalidate>
+      <p class="status error" *ngIf="message && message.includes('Erreur')" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>{{ message }}
+      </p>
+      <p class="status success" *ngIf="message && !message.includes('Erreur')" role="status">
+        <i class="fa-solid fa-circle-check"></i>{{ message }}
+      </p>
 
-        <!-- Step 1: Identity -->
+      <form class="form" (ngSubmit)="submit()" novalidate>
         <div class="form-step" *ngIf="currentStep === 1">
           <div class="field-row">
             <label class="field" for="nom">
               <span>Nom <em>*</em></span>
-              <input id="nom" name="nom" type="text" [(ngModel)]="formData.nom" required placeholder="Mrad">
+              <input id="nom" name="nom" type="text" [(ngModel)]="formData.nom" required placeholder="Mrad" autocomplete="family-name">
             </label>
             <label class="field" for="prenom">
-              <span>Prénom <em>*</em></span>
-              <input id="prenom" name="prenom" type="text" [(ngModel)]="formData.prenom" required placeholder="Sarra">
+              <span>Prenom <em>*</em></span>
+              <input id="prenom" name="prenom" type="text" [(ngModel)]="formData.prenom" required placeholder="Sarra" autocomplete="given-name">
             </label>
           </div>
 
           <label class="field" for="ville">
             <span>Ville</span>
-            <input id="ville" name="ville" type="text" [(ngModel)]="formData.ville" placeholder="Tunis">
+            <input id="ville" name="ville" type="text" [(ngModel)]="formData.ville" placeholder="Tunis" autocomplete="address-level2">
           </label>
 
           <label class="field avatar-field" for="profilePicture">
             <span>Photo de profil</span>
             <div class="avatar-upload" (click)="fileInput.click()">
               <div class="avatar-preview" *ngIf="avatarPreview">
-                <img [src]="avatarPreview" alt="Aperçu">
+                <img [src]="avatarPreview" alt="Apercu">
               </div>
               <div class="avatar-placeholder" *ngIf="!avatarPreview">
                 <i class="fa-solid fa-camera"></i>
@@ -65,10 +69,9 @@
           </button>
         </div>
 
-        <!-- Step 2: Expertise -->
         <div class="form-step" *ngIf="currentStep === 2">
           <label class="field" for="experienceYears">
-            <span>Années d'expérience</span>
+            <span>Annees d'experience</span>
             <div class="exp-slider-wrapper">
               <input id="experienceYears" name="experienceYears" type="range"
                 [(ngModel)]="formData.experienceYears" min="0" max="30" step="1"
@@ -78,7 +81,7 @@
           </label>
 
           <label class="field" for="stylistSpecialty">
-            <span>Spécialité</span>
+            <span>Specialite</span>
             <div class="style-grid">
               <button type="button" class="style-btn"
                 *ngFor="let s of specialties"
@@ -91,7 +94,7 @@
           </label>
 
           <label class="field" for="style">
-            <span>Style que vous maîtrisez</span>
+            <span>Style que vous maitrisez</span>
             <div class="style-grid">
               <button type="button" class="style-btn"
                 *ngFor="let s of styleOptions"
@@ -113,7 +116,6 @@
           </div>
         </div>
 
-        <!-- Step 3: Portfolio -->
         <div class="form-step" *ngIf="currentStep === 3">
           <label class="field" for="portfolio">
             <span>Lien portfolio / Instagram / Behance</span>
@@ -128,7 +130,7 @@
 
           <div class="portfolio-hint">
             <i class="fa-solid fa-circle-info"></i>
-            Un portfolio visible rassure les fashionistas et augmente vos réservations.
+            Un portfolio visible rassure les fashionistas et augmente vos reservations.
           </div>
 
           <div class="btn-row">
@@ -137,17 +139,13 @@
             </button>
             <button class="btn primary" type="submit" [disabled]="isLoading">
               <i class="fa-solid fa-check"></i>
-              {{ isLoading ? 'Création...' : 'Créer mon profil' }}
+              {{ isLoading ? 'Creation...' : 'Creer mon profil' }}
             </button>
           </div>
         </div>
-
       </form>
-
-      <p class="status" *ngIf="message"><i class="fa-solid fa-circle-info"></i>{{ message }}</p>
     </section>
 
-    <!-- Side panel -->
     <aside class="experience-panel" aria-hidden="true">
       <div class="wardrobe-preview">
         <div class="preview-header">
@@ -158,18 +156,18 @@
           <i class="fa-solid fa-scissors"></i>
         </div>
         <div class="closet-grid">
-          <span>👗</span>
-          <span class="selected">✂️</span>
-          <span>🪡</span>
-          <span class="selected">📐</span>
-          <span>🧵</span>
-          <span>💼</span>
+          <span>Look</span>
+          <span class="selected">Coupe</span>
+          <span>Palette</span>
+          <span class="selected">Brief</span>
+          <span>Tissu</span>
+          <span>Book</span>
         </div>
       </div>
       <div class="look-strip">
         <div>
           <span>Projet en cours</span>
-          <strong>Collection été</strong>
+          <strong>Collection ete</strong>
         </div>
         <div>
           <i class="fa-solid fa-star"></i>
@@ -179,7 +177,7 @@
       </div>
       <div class="insight-list">
         <span><i class="fa-solid fa-handshake"></i> Mise en relation clients</span>
-        <span><i class="fa-solid fa-chart-line"></i> Suivi de réputation</span>
+        <span><i class="fa-solid fa-chart-line"></i> Suivi de reputation</span>
         <span><i class="fa-solid fa-calendar-check"></i> Gestion rendez-vous</span>
       </div>
     </aside>

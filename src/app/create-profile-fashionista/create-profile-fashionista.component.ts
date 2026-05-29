@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import Swal from 'sweetalert2';
 
 import { FashionistaProfileService } from '../core/fashionista-profile.service';
@@ -10,7 +10,7 @@ import { AuthService } from '../core/auth/auth.service';
 @Component({
   selector: 'app-create-profile-fashionista',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './create-profile-fashionista.component.html',
   styleUrls: ['./create-profile-fashionista.component.css']
 })
