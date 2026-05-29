@@ -159,6 +159,12 @@
   font-weight: 900;
 }
 
+.avatar-icon {
+  color: var(--button-dark);
+  font-size: 48px;
+  line-height: 1;
+}
+
 .avatar-overlay {
   align-items: center;
   background: rgba(90, 65, 53, .52);
@@ -263,6 +269,43 @@ h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1.02; margin-top: 6px; }
 }
 
 /* ── Panel header ─────────────────────────────────────────────────────────── */
+.style-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 1fr;
+}
+
+.style-btn {
+  align-items: center;
+  background: rgba(234, 216, 211, .4);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 8px;
+  color: rgba(90, 65, 53, .65);
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  font-size: 13px;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: flex-start;
+  min-height: 48px;
+  padding: 12px 14px;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.style-btn:hover {
+  background: rgba(164, 110, 81, .14);
+  border-color: rgba(164, 110, 81, .35);
+  color: var(--button-dark);
+}
+
+.style-btn.selected {
+  background: rgba(164, 110, 81, .2);
+  border-color: var(--button-dark);
+  color: var(--button-dark);
+  font-weight: 900;
+}
+
 .panel-header {
   align-items: flex-start;
   display: flex;
@@ -439,6 +482,19 @@ h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1.02; margin-top: 6px; }
   box-sizing: border-box;
 }
 
+.field select {
+  background: rgba(234, 216, 211, .82);
+  border: 1px solid rgba(164, 110, 81, .18);
+  border-radius: 14px;
+  color: var(--text-primary);
+  min-height: 48px;
+  outline: none;
+  padding: 0 14px;
+  transition: border-color .2s ease, box-shadow .2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .field textarea {
   min-height: 120px;
   padding: 14px;
@@ -446,6 +502,7 @@ h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1.02; margin-top: 6px; }
 }
 
 .field input:focus,
+.field select:focus,
 .field textarea:focus {
   border-color: var(--button-dark);
   box-shadow: 0 0 0 4px rgba(227, 182, 174, .36);

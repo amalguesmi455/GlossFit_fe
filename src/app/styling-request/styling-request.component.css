@@ -527,6 +527,281 @@ h2 {
   line-height: 1.5;
 }
 
+.workflow-card {
+  background: rgba(234, 216, 211, .82);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(90, 65, 53, .12);
+  display: grid;
+  gap: 18px;
+  margin-top: 22px;
+  padding: clamp(22px, 3vw, 30px);
+}
+
+.workflow-section {
+  display: grid;
+  gap: 16px;
+}
+
+.section-head {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.proposal-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.wardrobe-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.wardrobe-card {
+  align-items: stretch;
+  background: rgba(227, 182, 174, .22);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 20px;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 74px minmax(0, 1fr) auto;
+  padding: 12px;
+  text-align: left;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.wardrobe-card:hover {
+  background: rgba(227, 182, 174, .34);
+  transform: translateY(-1px);
+}
+
+.wardrobe-card.selected {
+  background: rgba(164, 110, 81, .12);
+  border-color: var(--button-dark);
+  box-shadow: 0 14px 30px rgba(164, 110, 81, .12);
+}
+
+.wardrobe-visual {
+  align-items: center;
+  background: rgba(234, 216, 211, .82);
+  border-radius: 16px;
+  color: var(--button-dark);
+  display: flex;
+  height: 74px;
+  justify-content: center;
+  overflow: hidden;
+  width: 74px;
+}
+
+.wardrobe-visual img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.wardrobe-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.wardrobe-copy strong {
+  color: var(--button-dark);
+  font-size: 14px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.wardrobe-copy span,
+.wardrobe-copy small {
+  color: rgba(90, 65, 53, .72);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.wardrobe-check {
+  align-self: center;
+  color: transparent;
+  font-size: 18px;
+  margin-left: auto;
+}
+
+.wardrobe-card.selected .wardrobe-check {
+  color: var(--button-dark);
+}
+
+.proposal-list {
+  display: grid;
+  gap: 14px;
+}
+
+.proposal-card {
+  background: rgba(227, 182, 174, .22);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 22px;
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.proposal-head {
+  align-items: flex-start;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.proposal-head h4 {
+  color: var(--text-primary);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  margin-top: 4px;
+}
+
+.proposal-head small {
+  color: rgba(90, 65, 53, .6);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.proposal-note {
+  color: rgba(90, 65, 53, .75);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.proposal-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.proposal-item {
+  align-items: center;
+  background: rgba(234, 216, 211, .86);
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 8px;
+  padding: 8px 10px;
+}
+
+.proposal-item span:last-child {
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.proposal-item-thumb {
+  align-items: center;
+  background: rgba(227, 182, 174, .32);
+  border-radius: 999px;
+  color: var(--button-dark);
+  display: inline-flex;
+  height: 28px;
+  justify-content: center;
+  overflow: hidden;
+  width: 28px;
+}
+
+.proposal-item-thumb img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.decision-note {
+  background: rgba(234, 216, 211, .84);
+  border-left: 4px solid var(--button-dark);
+  border-radius: 14px;
+  color: rgba(90, 65, 53, .78);
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+}
+
+.proposal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.done-row {
+  justify-content: flex-end;
+}
+
+.empty-workspace {
+  align-items: center;
+  color: rgba(90, 65, 53, .7);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  min-height: 260px;
+  text-align: center;
+}
+
+.modal-backdrop {
+  align-items: center;
+  background: rgba(35, 22, 18, .42);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 20px;
+  position: fixed;
+  z-index: 40;
+  margin-top: 82px;
+}
+
+.request-modal {
+  background: rgba(234, 216, 211, .98);
+  border: 1px solid rgba(164, 110, 81, .18);
+  border-radius: 28px;
+  box-shadow: 0 30px 80px rgba(35, 22, 18, .28);
+  display: grid;
+  gap: 18px;
+  max-height: min(88vh, 980px);
+  padding: 22px;
+  width: min(100%, 980px);
+}
+
+.modal-scroll {
+  display: grid;
+  overflow: auto
+}
+
+.modal-hero {
+  align-items: flex-start;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+}
+
+.modal-close {
+  align-items: center;
+  background: rgba(227, 182, 174, .3);
+  border: 1px solid rgba(164, 110, 81, .14);
+  border-radius: 999px;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  min-width: 42px;
+}
+
 @media (max-width: 980px) {
   .styling-layout {
     grid-template-columns: 1fr;
@@ -563,5 +838,45 @@ h2 {
 
   .request-role {
     text-align: left;
+  }
+
+  .section-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .wardrobe-card {
+    grid-template-columns: 74px minmax(0, 1fr);
+  }
+
+  .wardrobe-check {
+    display: none;
+  }
+
+  .proposal-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .proposal-actions {
+    flex-direction: column;
+  }
+
+  .proposal-actions .btn,
+  .proposal-actions .btn.action {
+    width: 100%;
+  }
+
+  .modal-backdrop {
+    padding: 12px;
+  }
+
+  .request-modal {
+    max-height: 92vh;
+    padding: 18px;
+  }
+
+  .modal-hero {
+    flex-direction: column;
   }
 }

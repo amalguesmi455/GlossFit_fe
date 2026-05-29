@@ -1,0 +1,74 @@
+<main class="settings-page">
+  <div class="state-overlay" *ngIf="loading">
+    <i class="fa-solid fa-spinner fa-spin"></i>
+    <p>Chargement des paramètres…</p>
+  </div>
+
+  <section class="settings-layout" *ngIf="!loading && user">
+    <article class="settings-card">
+      <div class="settings-head">
+        <div>
+          <span class="eyebrow"><i class="fa-solid fa-sliders"></i> Paramètres</span>
+          <h1>{{ displayName }}</h1>
+          <p class="lead">Informations du compte et demande de lien pour changer le mot de passe.</p>
+        </div>
+      </div>
+
+      <div class="info-grid">
+        <div class="info-item">
+          <span>Email</span>
+          <strong>{{ user.email }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Rôle</span>
+          <strong>{{ roleLabel }}</strong>
+        </div>
+        <div class="info-item">
+          <span>Profil</span>
+          <strong>{{ user.hasProfile ? 'Activé' : 'Non créé' }}</strong>
+        </div>
+      </div>
+    </article>
+
+    <article class="settings-card">
+      <div class="settings-section">
+        <span class="eyebrow"><i class="fa-solid fa-lock"></i> Mot de passe</span>
+        <h2>Changer le mot de passe</h2>
+        <p class="lead">Clique pour recevoir un email qui valide le changement de votre mot de passe.</p>
+
+        <button class="btn primary" type="button" (click)="requestPasswordReset()" [disabled]="requestingReset">
+          <i class="fa-solid fa-envelope"></i>
+          {{ requestingReset ? 'Envoi...' : 'Nouveau mot de passe' }}
+        </button>
+      </div>
+
+      <div class="settings-divider"></div>
+
+      <div class="settings-section" *ngIf="user.role === 'FASHIONISTA' || user.role === 'STYLISTE'">
+        <span class="eyebrow danger-eyebrow"><i class="fa-solid fa-user-slash"></i> Compte</span>
+        <h2>Supprimer le compte</h2>
+        <p class="lead">
+          Si tu supprimes ton compte, il sera désactivé pendant 30 jours et tu ne pourras pas créer un nouveau compte avec la même adresse e-mail.
+          Après ces 30 jours, il sera supprimé définitivement.
+        </p>
+
+        <button
+          class="btn danger"
+          type="button"
+          (click)="deleteAccount()"
+          [disabled]="deletingAccount"
+        >
+          <i class="fa-solid fa-user-slash"></i>
+          {{ deletingAccount ? 'Suppression...' : 'Supprimer mon compte' }}
+        </button>
+      </div>
+
+      <p class="status" *ngIf="message"><i class="fa-solid fa-triangle-exclamation"></i>{{ message }}</p>
+    </article>
+  </section>
+
+  <div class="state-overlay" *ngIf="!loading && !user">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <p>Impossible de charger les informations du compte.</p>
+  </div>
+</main>

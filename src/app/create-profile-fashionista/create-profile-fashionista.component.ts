@@ -48,7 +48,14 @@ export class CreateProfileFashionistaComponent implements OnInit {
   morphologies = [
     { label: 'Sablier', value: 'sablier', icon: 'fa-solid fa-hourglass-end' },
     { label: 'Poire', value: 'poire', icon: 'fa-solid fa-apple-whole' },
-    { label: 'Rectangle', value: 'rectangle', icon: 'fa-solid fa-square' }
+    { label: 'Rectangle', value: 'rectangle', icon: 'fa-solid fa-square' },
+    { label: 'Triangle inversé', value: 'triangle_inverse', icon: 'fa-solid fa-caret-up' },
+    { label: 'Ronde', value: 'ronde', icon: 'fa-solid fa-circle' },
+    { label: 'Ovale', value: 'ovale', icon: 'fa-solid fa-egg' },
+    { label: 'Diamant', value: 'diamant', icon: 'fa-solid fa-gem' },
+    { label: 'Athlétique', value: 'athletique', icon: 'fa-solid fa-dumbbell' },
+    { label: 'Fine', value: 'fine', icon: 'fa-solid fa-minus' },
+    { label: 'Pulpeuse', value: 'pulpeuse', icon: 'fa-solid fa-heart' },
   ];
 
   styleOptions = [

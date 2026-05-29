@@ -35,7 +35,7 @@
                class="avatar-img"
                (error)="previewUrl = null; profilePictureUrl = null" />
           <ng-template #initials>
-            <span class="avatar-initial">{{ initialsText }}</span>
+            <i class="fa-solid fa-circle-user avatar-icon" aria-hidden="true"></i>
           </ng-template>
           <div class="avatar-overlay" *ngIf="isEditing">
             <i class="fa-solid fa-camera"></i>
@@ -67,7 +67,7 @@
       <!-- ── Mini board ── -->
       <div class="mini-board" aria-label="Fiche styliste">
         <div class="board-head">
-          <span><i class="fa-solid fa-scissors"></i> Signature style</span>
+          <span><i class="fa-solid fa-paintbrush"></i> Signature style</span>
           <small>{{ profile.ville }}</small>
         </div>
         <div class="tag-row">
@@ -79,11 +79,11 @@
           </span>
         </div>
         <div class="profile-actions">
-          <a class="btn primary" routerLink="/demand">
+          <a class="btn primary" routerLink="/styling-request">
             <i class="fa-solid fa-inbox"></i> Voir les demandes
           </a>
-          <a class="btn soft" routerLink="/dressing">
-            <i class="fa-solid fa-shirt"></i> Consulter dressing
+          <a class="btn soft" routerLink="/feed">
+            <i class="fa-solid fa-newspaper"></i> Identité stylistique
           </a>
         </div>
       </div>
@@ -158,7 +158,7 @@
         </div>
         <div class="info-row">
           <div class="info-item">
-            <span class="info-label"><i class="fa-solid fa-scissors"></i> Spécialité</span>
+            <span class="info-label"><i class="fa-solid fa-shirt"></i> Spécialité</span>
             <span class="info-value">{{ profile.stylistSpecialty || '—' }}</span>
           </div>
           <div class="info-item">
@@ -205,7 +205,10 @@
         <div class="form-grid">
           <div class="field">
             <label for="specialty">Spécialité</label>
-            <input id="specialty" name="specialty" [(ngModel)]="draft.specialty" />
+            <select id="specialty" name="specialty" [(ngModel)]="draft.specialty">
+              <option value="" disabled selected>Choisir une spécialité</option>
+              <option *ngFor="let s of specialties" [value]="s.value">{{ s.label }}</option>
+            </select>
           </div>
           <div class="field">
             <label for="city">Ville</label>
@@ -229,7 +232,10 @@
         <!-- Univers stylistique -->
         <div class="field">
           <label for="style">Univers stylistique</label>
-          <textarea id="style" name="style" [(ngModel)]="draft.style"></textarea>
+          <select id="style" name="style" [(ngModel)]="draft.style">
+            <option value="" disabled selected>Choisir un univers</option>
+            <option *ngFor="let s of styleOptions" [value]="s.value">{{ s.label }}</option>
+          </select>
         </div>
 
         <!-- New photo preview -->

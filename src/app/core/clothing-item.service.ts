@@ -49,6 +49,10 @@ export class ClothingItemService {
     return this.http.get<ClothingItem[]>(this.apiUrl);
   }
 
+  getFashionistaWardrobe(fashionistaUserId: number): Observable<ClothingItem[]> {
+    return this.http.get<ClothingItem[]>(`${environment.apiUrl}/wardrobe-access/fashionista/${fashionistaUserId}`);
+  }
+
   getClothingItem(itemId: number): Observable<ClothingItem> {
     return this.http.get<ClothingItem>(`${this.apiUrl}/${itemId}`);
   }

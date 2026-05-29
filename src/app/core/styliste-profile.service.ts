@@ -19,6 +19,12 @@ export interface StylisteProfile extends StylisteProfileData {
   userId: number;
   profilePictureUrl?: string; // ✅ URL returned by the backend (stored path in DB)
   createdAt?: string;
+  active?: boolean;
+  user?: {
+    id?: number;
+    email?: string;
+    active?: boolean;
+  };
 }
 
 @Injectable({
@@ -33,9 +39,23 @@ export class StylisteProfileService {
   // ✅ Resolves a stored relative path from the DB into a full URL
   getProfilePictureUrl(relativePath: string | undefined): string | null {
     if (!relativePath) return null;
-    // If the backend already returns an absolute URL, return it as-is
-    if (relativePath.startsWith('http')) return relativePath;
-    return `${environment.apiUrl}/${relativePath}`;
+
+    const trimmed = relativePath.trim();
+    const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+
+    if (/^(https?:)?\/\//.test(trimmed) || trimmed.startsWith('data:')) {
+      return trimmed;
+    }
+
+    if (trimmed.startsWith('/')) {
+      return `${baseUrl}${trimmed}`;
+    }
+
+    if (trimmed.includes('/')) {
+      return `${baseUrl}/${trimmed.replace(/^\/+/, '')}`;
+    }
+
+    return `${baseUrl}/uploads/profiles/${encodeURIComponent(trimmed)}`;
   }
 
   createProfile(profileData: StylisteProfileData, userId: number): Observable<StylisteProfile> {
@@ -55,6 +75,18 @@ export class StylisteProfileService {
   updateProfile(userId: number, profileData: StylisteProfileData): Observable<StylisteProfile> {
     const formData = this.buildFormData(profileData);
     return this.http.put<StylisteProfile>(`${this.apiUrl}/${userId}`, formData);
+  }
+
+  updateAccountStatus(profile: StylisteProfile, active: boolean, userId?: number): Observable<StylisteProfile> {
+    const resolvedUserId = userId ?? profile.userId ?? profile.user?.id;
+
+    if (!resolvedUserId) {
+      throw new Error('User ID missing.');
+    }
+
+    const formData = this.buildFormData(profile);
+    formData.append('active', String(active));
+    return this.http.put<StylisteProfile>(`${this.apiUrl}/${resolvedUserId}`, formData);
   }
 
   deleteProfile(userId: number): Observable<void> {

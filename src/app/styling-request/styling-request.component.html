@@ -1,4 +1,4 @@
-﻿<main class="styling-page">
+<main class="styling-page">
   <section class="styling-layout">
     <article class="hero-panel">
       <div class="panel-top">
@@ -28,6 +28,10 @@
           <strong>{{ statusCounts.REFUSED }}</strong>
           <span>refusées</span>
         </div>
+        <div>
+          <strong>{{ statusCounts.DONE }}</strong>
+          <span>terminées</span>
+        </div>
       </div>
 
       @if (message) {
@@ -40,9 +44,6 @@
             <span class="eyebrow">
               <i class="fa-solid fa-paper-plane"></i>
               Nouveau brief
-            </span>
-            <span class="status-pill">
-              {{ stylists.length }} stylistes
             </span>
           </div>
 
@@ -61,6 +62,8 @@
                   (click)="chooseStylist(stylist)"
                 >
                   <strong>{{ stylist.prenom }} {{ stylist.nom }}</strong>
+                  <span>{{ stylist.style }}</span>
+                  <small>{{ stylist.ville }}</small>
                 </button>
               } @empty {
                 <div class="empty-inline">
@@ -180,7 +183,7 @@
             <i class="fa-solid fa-inbox"></i>
             Demandes
           </span>
-          <span class="status-pill">{{ filteredRequests.length }} affichées</span>
+          <span class="status-pill">{{ selectedRequest ? '1 sélectionnée' : filteredRequests.length + ' affichées' }}</span>
         </div>
         <h2>Suivi par statut</h2>
         <p class="panel-intro">
@@ -204,7 +207,7 @@
 
       <div class="request-list">
         @for (request of filteredRequests; track request.id) {
-          <article class="request-card">
+          <article class="request-card" [class.active]="selectedRequestId === request.id">
             <div class="request-icon">
               <i class="fa-solid fa-shirt"></i>
             </div>
@@ -236,8 +239,13 @@
                 <span><i class="fa-solid fa-user-tie"></i> {{ requestCounterpart(request) }}</span>
               </div>
 
-              @if (viewerRole === 'STYLISTE' && request.status === 'PENDING') {
-                <div class="request-actions">
+              <div class="request-actions">
+                <button type="button" class="btn action soft" (click)="openRequestModal(request)">
+                  <i class="fa-solid fa-folder-open"></i>
+                  {{ requestActionLabel() }}
+                </button>
+
+                @if (viewerRole === 'STYLISTE' && request.status === 'PENDING') {
                   <button type="button" class="btn action accept" (click)="acceptRequest(request.id)">
                     <i class="fa-solid fa-circle-check"></i>
                     Accepter
@@ -246,8 +254,8 @@
                     <i class="fa-solid fa-circle-xmark"></i>
                     Refuser
                   </button>
-                </div>
-              }
+                }
+              </div>
             </div>
           </article>
         } @empty {
@@ -266,4 +274,225 @@
       </div>
     </aside>
   </section>
+
+  @if (isRequestModalOpen && selectedRequest) {
+    <div class="modal-backdrop" (click)="closeRequestModal()">
+      <section class="request-modal" (click)="$event.stopPropagation()">
+        <div class="panel-top">
+          <span class="eyebrow">
+            <i class="fa-solid fa-folder-open"></i>
+            Demande sélectionnée
+          </span>
+          <button type="button" class="modal-close" (click)="closeRequestModal()" aria-label="Fermer la modale">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="modal-scroll">
+          <div class="modal-hero">
+            <div>
+              <span class="status-pill">{{ statusLabel(selectedRequest.status) }}</span>
+              <h2>{{ selectedRequest.eventType }}</h2>
+              <p class="panel-intro">{{ selectedRequest.description || 'Aucune description fournie.' }}</p>
+            </div>
+          </div>
+
+          <div class="tag-row">
+            <span>{{ selectedRequest.dressCode }}</span>
+            <span>{{ selectedRequest.theme }}</span>
+            <span>{{ selectedRequest.formalityLevel }}</span>
+            <span>{{ selectedRequest.season }}</span>
+          </div>
+
+          <div class="request-meta">
+            <span><i class="fa-solid fa-calendar-day"></i> {{ selectedRequest.eventDateTime | date:'dd/MM/yyyy HH:mm' }}</span>
+            <span><i class="fa-solid fa-location-dot"></i> {{ selectedRequest.place }}</span>
+            <span><i class="fa-solid fa-user-tie"></i> {{ requestCounterpart(selectedRequest) }}</span>
+          </div>
+
+          @if (selectedRequestMessage) {
+            <p class="panel-message">{{ selectedRequestMessage }}</p>
+          }
+
+          @if (viewerRole === 'STYLISTE') {
+            <div class="workflow-section">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">
+                    <i class="fa-solid fa-shirt"></i>
+                    Dressing accessible
+                  </span>
+                  <h3>Composer une proposition</h3>
+                </div>
+                <span class="status-pill">{{ selectedRequestWardrobe.length }} pièces</span>
+              </div>
+
+              @if (selectedRequest.status !== 'ACCEPTED') {
+                <div class="empty-inline">
+                  La demande est fermée tu ne peut pas accéder au dressing et proposer une tenue.
+                </div>
+              } @else {
+                @if (wardrobeLoading) {
+                  <div class="empty-inline">Chargement du dressing…</div>
+                } @else if (selectedRequestWardrobe.length) {
+                  <div class="wardrobe-grid">
+                    @for (item of selectedRequestWardrobe; track item.id) {
+                      <button
+                        type="button"
+                        class="wardrobe-card"
+                        [class.selected]="isProposalItemSelected(item.id)"
+                        (click)="toggleProposalItem(item.id)"
+                      >
+                        <div class="wardrobe-visual">
+                          @if (item.image) {
+                            <img [src]="resolveImageUrl(item.image)" [alt]="item.description">
+                          } @else {
+                            <i class="fa-solid fa-shirt"></i>
+                          }
+                        </div>
+
+                        <div class="wardrobe-copy">
+                          <strong>{{ item.description }}</strong>
+                          <span>{{ item.brand }}</span>
+                          <small>{{ item.category }} · {{ item.style }}</small>
+                        </div>
+
+                        <i class="fa-solid fa-check wardrobe-check"></i>
+                      </button>
+                    }
+                  </div>
+                } @else {
+                  <div class="empty-inline">Aucune pièce n’est disponible dans ce dressing.</div>
+                }
+
+                <form class="proposal-form" (ngSubmit)="submitProposal()">
+                  <div class="field">
+                    <label for="proposalTitle">Titre de la proposition</label>
+                    <input id="proposalTitle" name="proposalTitle" [(ngModel)]="proposalForm.title" placeholder="Ex: Silhouette élégante et légère" required>
+                  </div>
+
+                  <div class="field">
+                    <label for="proposalNoteArea">Note du styliste</label>
+                    <textarea
+                      id="proposalNoteArea"
+                      name="proposalNoteArea"
+                      [(ngModel)]="proposalForm.stylistNote"
+                      placeholder="Pourquoi cette combinaison fonctionne pour la fashionista..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <div class="proposal-actions">
+                    <button class="btn primary" type="submit" [disabled]="proposalSubmitting || !canCreateProposalForSelectedRequest">
+                      <i class="fa-solid fa-wand-magic-sparkles"></i>
+                      {{ proposalSubmitting ? 'Envoi…' : 'Créer la proposition' }}
+                    </button>
+                  </div>
+                </form>
+              }
+            </div>
+          }
+
+          @if (viewerRole === 'FASHIONISTA') {
+            <div class="workflow-section">
+              <div class="section-head">
+                <div>
+                  <span class="eyebrow">
+                    <i class="fa-solid fa-braille"></i>
+                    Proposition du styliste
+                  </span>
+                  <h3>Répondre à la tenue proposée</h3>
+                </div>
+                <span class="status-pill">{{ selectedRequestProposals.length }} propositions</span>
+              </div>
+
+              @if (proposalLoading) {
+                <div class="empty-inline">Chargement des propositions…</div>
+              } @else if (!selectedRequestProposals.length) {
+                <div class="empty-inline">Aucune proposition n’est encore disponible pour cette demande.</div>
+              } @else {
+                <div class="proposal-list">
+                  @for (proposal of selectedRequestProposals; track proposal.id) {
+                    <article class="proposal-card" [class.pending]="proposal.status === 'PENDING_REVIEW'" [class.accepted]="proposal.status === 'ACCEPTED'" [class.refused]="proposal.status === 'REFUSED'">
+                      <div class="proposal-head">
+                        <div>
+                          <span class="mini-label">{{ proposalStatusLabel(proposal.status) }}</span>
+                          <h4>{{ proposal.title }}</h4>
+                        </div>
+                        <small>{{ proposal.createdAt | date:'dd/MM/yyyy HH:mm' }}</small>
+                      </div>
+
+                      <p class="proposal-note">{{ proposal.stylistNote }}</p>
+
+                      <div class="proposal-items">
+                        @for (item of proposal.clothingItems; track item.id) {
+                          <div class="proposal-item">
+                            <span class="proposal-item-thumb">
+                              @if (item.image) {
+                                <img [src]="resolveImageUrl(item.image)" [alt]="item.description">
+                              } @else {
+                                <i class="fa-solid fa-shirt"></i>
+                              }
+                            </span>
+                            <span>{{ item.description }}</span>
+                          </div>
+                        }
+                      </div>
+
+                      @if (proposal.status === 'PENDING_REVIEW') {
+                        <div class="field">
+                          <label [for]="'decisionReason-' + proposal.id">Petit mot</label>
+                          <textarea
+                            [id]="'decisionReason-' + proposal.id"
+                            [name]="'decisionReason-' + proposal.id"
+                            [(ngModel)]="proposalDecisionReasons[proposal.id]"
+                            placeholder="Tu peux expliquer ce que tu aimes ou ce que tu veux changer..."
+                          ></textarea>
+                        </div>
+
+                        <div class="proposal-actions">
+                          <button
+                            type="button"
+                            class="btn primary"
+                            [disabled]="decisionSubmittingProposalId === proposal.id"
+                            (click)="respondToProposal(proposal, 'ACCEPTED')"
+                          >
+                            <i class="fa-solid fa-check"></i>
+                            Accepter
+                          </button>
+                          <button
+                            type="button"
+                            class="btn soft"
+                            [disabled]="decisionSubmittingProposalId === proposal.id"
+                            (click)="respondToProposal(proposal, 'REFUSED')"
+                          >
+                            <i class="fa-solid fa-xmark"></i>
+                            Refuser
+                          </button>
+                        </div>
+                      } @else {
+                        <div class="decision-note">
+                          <strong>Retour :</strong>
+                          <span>{{ proposal.decisionReason || 'Aucun commentaire ajouté.' }}</span>
+                        </div>
+                      }
+                    </article>
+                  }
+                </div>
+
+                @if (canMarkSelectedRequestAsDone) {
+                  <div class="proposal-actions done-row">
+                    <button class="btn primary" type="button" (click)="markSelectedRequestAsDone()" [disabled]="doneSubmitting">
+                      <i class="fa-solid fa-flag-checkered"></i>
+                      {{ doneSubmitting ? 'Marquage…' : 'Marquer comme terminée' }}
+                    </button>
+                  </div>
+                }
+              }
+            </div>
+          }
+        </div>
+      </section>
+    </div>
+  }
 </main>

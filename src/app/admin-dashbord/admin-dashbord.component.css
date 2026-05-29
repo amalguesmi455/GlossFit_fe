@@ -174,7 +174,7 @@ h2 {
   border-radius: 8px;
   display: grid;
   gap: 14px;
-  grid-template-columns: 46px minmax(0, 1fr) minmax(160px, .7fr);
+  grid-template-columns: 58px minmax(0, 1.1fr) minmax(0, .9fr) auto;
   padding: 12px;
 }
 
@@ -194,6 +194,23 @@ h2 {
   height: 46px;
   justify-content: center;
   width: 46px;
+}
+
+.profile-avatar {
+  overflow: hidden;
+  height: 58px;
+  width: 58px;
+}
+
+.profile-avatar.has-image {
+  background: #f6ece6;
+}
+
+.profile-avatar img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .profile-main,
@@ -223,9 +240,33 @@ h2 {
   font-weight: 900;
 }
 
+.status-chip {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 6px;
+  justify-self: start;
+  padding: 5px 10px;
+  width: fit-content;
+}
+
+.status-chip.active {
+  background: rgba(47, 143, 70, .12);
+  border-color: rgba(47, 143, 70, .18);
+  color: #2f8f46;
+}
+
+.status-chip.inactive {
+  background: rgba(192, 80, 58, .12);
+  border-color: rgba(192, 80, 58, .18);
+  color: #c0503a;
+}
+
 .row-actions {
   display: flex;
   gap: 8px;
+  justify-content: flex-end;
 }
 
 .icon-btn {
@@ -250,6 +291,34 @@ h2 {
   background: #fff1f1;
   border-color: rgba(192, 80, 58, .28);
   color: #c0503a;
+}
+
+.status-toggle {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  display: inline-flex;
+  height: 42px;
+  justify-content: center;
+  width: 42px;
+}
+
+.status-toggle.active {
+  background: rgba(47, 143, 70, .14);
+  border-color: rgba(47, 143, 70, .22);
+  color: #2f8f46;
+}
+
+.status-toggle.inactive {
+  background: rgba(192, 80, 58, .14);
+  border-color: rgba(192, 80, 58, .22);
+  color: #c0503a;
+}
+
+.status-toggle:disabled {
+  cursor: not-allowed;
+  opacity: .55;
 }
 
 .empty-state {
@@ -433,11 +502,15 @@ h2 {
   }
 
   .row-actions {
-    justify-content: stretch;
+    justify-content: flex-start;
   }
 
   .icon-btn {
     flex: 1;
+  }
+
+  .status-toggle {
+    width: 100%;
   }
 
   .profile-row {

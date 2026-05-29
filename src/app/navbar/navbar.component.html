@@ -11,8 +11,9 @@
           <ng-container *ngIf="isLoggedIn; else landingMenu">
             <a class="nav-link" routerLink="/feed"    routerLinkActive="active">Feed</a>
             <a class="nav-link" routerLink="/home"    routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Dashboard</a>
-            <a class="nav-link" routerLink="/dressing" routerLinkActive="active">Dressing</a>
-            <a class="nav-link" routerLink="/styling"  routerLinkActive="active">Styling</a>
+            <a class="nav-link" *ngIf="user.role === 'ADMIN'" [routerLink]="profileRoute" routerLinkActive="active">Profils</a>
+            <a class="nav-link" *ngIf="user.role !== 'ADMIN' && user.role !== 'STYLISTE'" routerLink="/dressing" routerLinkActive="active">Dressing</a>
+            <a class="nav-link" *ngIf="user.role !== 'ADMIN'" routerLink="/styling"  routerLinkActive="active">Styling</a>
           </ng-container>
           <ng-template #landingMenu>
             <button class="nav-link" [class.active]="activeSection === 'features'" type="button" (click)="goToSection('features')">Fonctionnalites</button>
@@ -39,7 +40,7 @@
           <ng-template #loggedInMenu>
 
             <!-- ── Notification bell ── -->
-            <div class="notif-menu-wrapper">
+            <div class="notif-menu-wrapper" *ngIf="user.role !== 'ADMIN'">
               <button class="icon-btn" type="button"
                       aria-label="Notifications"
                       title="Notifications"
@@ -73,9 +74,9 @@
                 <!-- List -->
                 <ul class="notif-list" *ngIf="notifications.length > 0">
                   <li class="notif-item"
-                      *ngFor="let n of notifications"
-                      [class.unread]="!n.isRead"
-                      (click)="onMarkAsRead(n, $event)">
+                       *ngFor="let n of notifications"
+                       [class.unread]="!n.isRead"
+                      (click)="onNotificationClick(n, $event)">
                     <span class="notif-icon">
                       <i [class]="notifIcon(n.type)"></i>
                     </span>
@@ -92,7 +93,16 @@
             <!-- ── Profile menu ── -->
             <div class="profile-menu-wrapper">
               <button class="user-avatar-btn" type="button" (click)="toggleProfileMenu()">
-                <span class="user-avatar">{{ user.avatar }}</span>
+                <span class="user-avatar">
+                  <img *ngIf="profileAvatarUrl; else userInitials"
+                       [src]="profileAvatarUrl"
+                       [alt]="user.name"
+                       class="user-avatar-img"
+                       (error)="profileAvatarUrl = null" />
+                  <ng-template #userInitials>
+                    <i class="fa-solid fa-circle-user user-avatar-icon" aria-hidden="true"></i>
+                  </ng-template>
+                </span>
                 <span class="user-name">{{ user.name }}</span>
                 <svg class="chevron" [class.open]="isProfileMenuOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="6 9 12 15 18 9" />
@@ -104,8 +114,8 @@
                   <span class="dropdown-name">{{ user.name }}</span>
                   <span class="dropdown-role">{{ displayRole }}</span>
                 </div>
-                <a class="dropdown-item" [routerLink]="profileRoute"  (click)="closeMobileMenu()">Mon profil</a>
-                <a class="dropdown-item" [routerLink]="settingsRoute" (click)="closeMobileMenu()">Parametres</a>
+                <a class="dropdown-item" [routerLink]="profileRoute"  (click)="closeMobileMenu(); closeProfileMenu()">{{ profileMenuLabel }}</a>
+                <a class="dropdown-item" [routerLink]="settingsRoute" (click)="closeMobileMenu(); closeProfileMenu()">Parametres</a>
                 <div class="dropdown-divider"></div>
                 <button class="dropdown-item logout" type="button" (click)="logout()">Deconnexion</button>
               </div>
@@ -138,7 +148,16 @@
 
       <ng-template #mobileLoggedInMenu>
         <div class="mobile-user-info">
-          <span class="user-avatar">{{ user.avatar }}</span>
+          <span class="user-avatar">
+            <img *ngIf="profileAvatarUrl; else mobileUserInitials"
+                 [src]="profileAvatarUrl"
+                 [alt]="user.name"
+                 class="user-avatar-img"
+                 (error)="profileAvatarUrl = null" />
+            <ng-template #mobileUserInitials>
+              <i class="fa-solid fa-circle-user user-avatar-icon" aria-hidden="true"></i>
+            </ng-template>
+          </span>
           <div>
             <span class="mobile-user-name">{{ user.name }}</span>
             <span class="mobile-user-role">{{ displayRole }}</span>
@@ -146,7 +165,7 @@
         </div>
 
         <!-- Mobile notification summary -->
-        <div class="mobile-notif-row" *ngIf="unreadCount > 0">
+         <div class="mobile-notif-row" *ngIf="user.role !== 'ADMIN' && unreadCount > 0">
           <i class="fa-solid fa-bell"></i>
           <span>{{ unreadCount }} notification{{ unreadCount > 1 ? 's' : '' }} non lue{{ unreadCount > 1 ? 's' : '' }}</span>
           <button class="mobile-notif-read-all" type="button" (click)="onMarkAllAsRead()">
@@ -156,10 +175,11 @@
 
         <a class="mobile-link" routerLink="/feed"     (click)="closeMobileMenu()">Feed</a>
         <a class="mobile-link" routerLink="/home"     (click)="closeMobileMenu()">Dashboard</a>
-        <a class="mobile-link" routerLink="/dressing" (click)="closeMobileMenu()">Dressing</a>
-        <a class="mobile-link" routerLink="/styling"  (click)="closeMobileMenu()">Styling</a>
-        <a class="mobile-link" [routerLink]="profileRoute"  (click)="closeMobileMenu()">Mon profil</a>
-        <a class="mobile-link" [routerLink]="settingsRoute" (click)="closeMobileMenu()">Parametres</a>
+        <a class="mobile-link" *ngIf="user.role === 'ADMIN'" [routerLink]="profileRoute" (click)="closeMobileMenu(); closeProfileMenu()">Profils</a>
+        <a class="mobile-link" *ngIf="user.role !== 'ADMIN' && user.role !== 'STYLISTE'" routerLink="/dressing" (click)="closeMobileMenu()">Dressing</a>
+        <a class="mobile-link" *ngIf="user.role !== 'ADMIN'" routerLink="/styling"  (click)="closeMobileMenu()">Styling</a>
+        <a class="mobile-link" *ngIf="user.role !== 'ADMIN'" [routerLink]="profileRoute"  (click)="closeMobileMenu(); closeProfileMenu()">{{ profileMenuLabel }}</a>
+        <a class="mobile-link" [routerLink]="settingsRoute" (click)="closeMobileMenu(); closeProfileMenu()">Parametres</a>
         <button class="btn btn-logout-mobile" type="button" (click)="logout()">Deconnexion</button>
       </ng-template>
     </div>

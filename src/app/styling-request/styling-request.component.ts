@@ -1,10 +1,22 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 import Swal from 'sweetalert2';
 
+import { environment } from '../../environments/environment';
 import { AuthService } from '../core/auth/auth.service';
+import {
+  ClothingItem,
+  ClothingItemService,
+} from '../core/clothing-item.service';
 import { FashionistaProfileService } from '../core/fashionista-profile.service';
+import {
+  StylingProposal,
+  StylingProposalCreatePayload,
+  StylingProposalDecisionPayload,
+  StylingProposalService,
+} from '../core/styling-proposal.service';
 import {
   StylisteProfile,
   StylisteProfileService,
@@ -13,9 +25,10 @@ import {
   StylingRequest,
   StylingRequestCreatePayload,
   StylingRequestService,
+  StylingRequestUserRef,
 } from '../core/styling-request.service';
 
-type RequestTab = 'PENDING' | 'ACCEPTED' | 'REFUSED';
+type RequestTab = 'PENDING' | 'ACCEPTED' | 'REFUSED' | 'DONE';
 type ViewerRole = 'FASHIONISTA' | 'STYLISTE' | 'ADMIN';
 
 type Suggestion = {
@@ -37,6 +50,12 @@ interface StylingRequestForm {
   description: string;
 }
 
+interface StylingProposalForm {
+  title: string;
+  stylistNote: string;
+  clothingItemIds: number[];
+}
+
 @Component({
   selector: 'app-styling-request',
   standalone: true,
@@ -49,6 +68,7 @@ export class StylingRequestComponent implements OnInit {
     { label: 'En attente', value: 'PENDING' },
     { label: 'Acceptées', value: 'ACCEPTED' },
     { label: 'Refusées', value: 'REFUSED' },
+    { label: 'Terminées', value: 'DONE' },
   ];
 
   readonly eventTypeOptions: Suggestion[] = [
@@ -146,14 +166,31 @@ export class StylingRequestComponent implements OnInit {
   profileId: number | null = null;
   currentUserId: number | null = null;
   profileHint = '';
+  selectedRequestId: number | null = null;
+  selectedRequestMessage = '';
+  isRequestModalOpen = false;
+  proposalLoading = false;
+  wardrobeLoading = false;
+  proposalSubmitting = false;
+  decisionSubmittingProposalId: number | null = null;
+  doneSubmitting = false;
+  selectedRequestProposals: StylingProposal[] = [];
+  selectedRequestWardrobe: ClothingItem[] = [];
+  proposalDecisionReasons: Record<number, string> = {};
+  proposalForm: StylingProposalForm = this.createEmptyProposalForm();
 
   requestForm: StylingRequestForm = this.createEmptyRequestForm();
+  private pendingRequestSelectionId: number | null = null;
+  private openPendingRequestModal = false;
 
   constructor(
+    private clothingItemService: ClothingItemService,
     private authService: AuthService,
+    private stylingProposalService: StylingProposalService,
     private stylingRequestService: StylingRequestService,
     private fashionistaProfileService: FashionistaProfileService,
-    private stylisteProfileService: StylisteProfileService
+    private stylisteProfileService: StylisteProfileService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -166,6 +203,7 @@ export class StylingRequestComponent implements OnInit {
 
     this.currentUserId = user.id;
     this.viewerRole = this.normalizeRole(user.role);
+    this.readPendingRequestSelection();
 
     if (this.viewerRole === 'ADMIN') {
       this.message = 'Cette page est réservée aux fashionistas et aux stylistes.';
@@ -190,6 +228,7 @@ export class StylingRequestComponent implements OnInit {
       PENDING: this.requests.filter((request) => request.status === 'PENDING').length,
       ACCEPTED: this.requests.filter((request) => request.status === 'ACCEPTED').length,
       REFUSED: this.requests.filter((request) => request.status === 'REFUSED').length,
+      DONE: this.requests.filter((request) => request.status === 'DONE').length,
     };
   }
 
@@ -222,6 +261,25 @@ export class StylingRequestComponent implements OnInit {
     }
   }
 
+  private readPendingRequestSelection(): void {
+    const requestIdParam = this.route.snapshot.queryParamMap.get('requestId');
+    if (!requestIdParam) {
+      this.pendingRequestSelectionId = null;
+      this.openPendingRequestModal = false;
+      return;
+    }
+
+    const requestId = Number(requestIdParam);
+    if (!Number.isFinite(requestId) || requestId <= 0) {
+      this.pendingRequestSelectionId = null;
+      this.openPendingRequestModal = false;
+      return;
+    }
+
+    this.pendingRequestSelectionId = requestId;
+    this.openPendingRequestModal = this.route.snapshot.queryParamMap.get('open') !== '0';
+  }
+
   applyDescriptionSuggestion(value: string): void {
     this.requestForm.description = value;
   }
@@ -237,7 +295,7 @@ export class StylingRequestComponent implements OnInit {
 
     this.stylingRequestService.acceptStylingRequest(requestId).subscribe({
       next: (updatedRequest) => {
-        this.updateRequestInList(updatedRequest);
+        this.handleUpdatedRequest(updatedRequest);
         void Swal.fire({
           icon: 'success',
           title: 'Demande acceptée',
@@ -259,7 +317,7 @@ export class StylingRequestComponent implements OnInit {
 
     this.stylingRequestService.refuseStylingRequest(requestId).subscribe({
       next: (updatedRequest) => {
-        this.updateRequestInList(updatedRequest);
+        this.handleUpdatedRequest(updatedRequest);
         void Swal.fire({
           icon: 'success',
           title: 'Demande refusée',
@@ -309,6 +367,7 @@ export class StylingRequestComponent implements OnInit {
         this.activeTab = 'PENDING';
         this.requestForm = this.createEmptyRequestForm();
         this.requestForm.fashionistaId = this.profileId;
+        this.selectRequest(createdRequest.id);
 
         void Swal.fire({
           icon: 'success',
@@ -333,12 +392,200 @@ export class StylingRequestComponent implements OnInit {
     });
   }
 
+  get selectedRequest(): StylingRequest | null {
+    return this.requests.find((request) => request.id === this.selectedRequestId) ?? null;
+  }
+
+  get selectedRequestLatestProposal(): StylingProposal | null {
+    return this.selectedRequestProposals[0] ?? null;
+  }
+
+  get canCreateProposalForSelectedRequest(): boolean {
+    if (this.viewerRole !== 'STYLISTE') {
+      return false;
+    }
+
+    const selectedRequest = this.selectedRequest;
+    const latestProposal = this.selectedRequestLatestProposal;
+
+    if (!selectedRequest || selectedRequest.status !== 'ACCEPTED') {
+      return false;
+    }
+
+    if (!latestProposal) {
+      return true;
+    }
+
+    return latestProposal.status === 'REFUSED';
+  }
+
+  get canMarkSelectedRequestAsDone(): boolean {
+    const selectedRequest = this.selectedRequest;
+    const latestProposal = this.selectedRequestLatestProposal;
+
+    if (!selectedRequest || this.viewerRole !== 'FASHIONISTA' || selectedRequest.status === 'DONE') {
+      return false;
+    }
+
+    return latestProposal !== null && (latestProposal.status === 'ACCEPTED' || latestProposal.status === 'REFUSED');
+  }
+
+  selectRequest(requestOrId: StylingRequest | number): void {
+    const requestId = typeof requestOrId === 'number' ? requestOrId : requestOrId.id;
+    this.selectedRequestId = requestId;
+    this.selectedRequestMessage = '';
+    this.proposalDecisionReasons = {};
+    this.proposalForm = this.createEmptyProposalForm();
+    this.loadSelectedRequestWorkspace(requestId);
+  }
+
+  openRequestModal(request: StylingRequest): void {
+    this.selectRequest(request);
+    this.isRequestModalOpen = true;
+  }
+
+  closeRequestModal(): void {
+    this.isRequestModalOpen = false;
+  }
+
+  toggleProposalItem(itemId: number): void {
+    const index = this.proposalForm.clothingItemIds.indexOf(itemId);
+    if (index >= 0) {
+      this.proposalForm.clothingItemIds = this.proposalForm.clothingItemIds.filter((id) => id !== itemId);
+      return;
+    }
+
+    this.proposalForm.clothingItemIds = [...this.proposalForm.clothingItemIds, itemId];
+  }
+
+  isProposalItemSelected(itemId: number): boolean {
+    return this.proposalForm.clothingItemIds.includes(itemId);
+  }
+
+  submitProposal(): void {
+    const selectedRequest = this.selectedRequest;
+
+    if (this.viewerRole !== 'STYLISTE' || !selectedRequest || !this.canCreateProposalForSelectedRequest) {
+      this.selectedRequestMessage = 'Sélectionne une demande acceptée avant de créer une proposition.';
+      return;
+    }
+
+    if (!this.proposalForm.title.trim() || !this.proposalForm.stylistNote.trim() || !this.proposalForm.clothingItemIds.length) {
+      this.selectedRequestMessage = 'Ajoute un titre, une note et au moins une pièce du dressing.';
+      return;
+    }
+
+    this.proposalSubmitting = true;
+    this.selectedRequestMessage = '';
+
+    const payload: StylingProposalCreatePayload = {
+      title: this.proposalForm.title.trim(),
+      stylistNote: this.proposalForm.stylistNote.trim(),
+      clothingItemIds: [...this.proposalForm.clothingItemIds],
+    };
+
+    this.stylingProposalService.createProposal(selectedRequest.id, payload).subscribe({
+      next: () => {
+        this.proposalSubmitting = false;
+        this.proposalForm = this.createEmptyProposalForm();
+        this.loadSelectedRequestWorkspace(selectedRequest.id);
+
+        void Swal.fire({
+          icon: 'success',
+          title: 'Proposition envoyée',
+          text: 'La fashionista peut maintenant voir ta tenue.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#a46e51',
+        });
+      },
+      error: (error) => {
+        this.proposalSubmitting = false;
+        this.selectedRequestMessage = this.getErrorMessage(error, 'Impossible de créer la proposition pour le moment.');
+      },
+    });
+  }
+
+  respondToProposal(proposal: StylingProposal, decision: 'ACCEPTED' | 'REFUSED'): void {
+    if (this.viewerRole !== 'FASHIONISTA') {
+      return;
+    }
+
+    const selectedRequest = this.selectedRequest;
+    if (!selectedRequest || proposal.status !== 'PENDING_REVIEW') {
+      return;
+    }
+
+    const reason = (this.proposalDecisionReasons[proposal.id] ?? '').trim();
+    if (decision === 'REFUSED' && !reason) {
+      this.selectedRequestMessage = 'Ajoute un petit message pour expliquer ton refus.';
+      return;
+    }
+
+    this.decisionSubmittingProposalId = proposal.id;
+    this.selectedRequestMessage = '';
+
+    const payload: StylingProposalDecisionPayload = {
+      decision,
+      reason,
+    };
+
+    this.stylingProposalService.respondToProposal(proposal.id, payload).subscribe({
+      next: () => {
+        this.decisionSubmittingProposalId = null;
+        this.loadSelectedRequestWorkspace(selectedRequest.id);
+
+        void Swal.fire({
+          icon: 'success',
+          title: decision === 'ACCEPTED' ? 'Proposition acceptée' : 'Proposition refusée',
+          text: 'Le styliste a été notifié de ta décision.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#a46e51',
+        });
+      },
+      error: (error) => {
+        this.decisionSubmittingProposalId = null;
+        this.selectedRequestMessage = this.getErrorMessage(error, 'Impossible d’envoyer ta décision pour le moment.');
+      },
+    });
+  }
+
+  markSelectedRequestAsDone(): void {
+    const selectedRequest = this.selectedRequest;
+    if (this.viewerRole !== 'FASHIONISTA' || !selectedRequest || !this.canMarkSelectedRequestAsDone) {
+      return;
+    }
+
+    this.doneSubmitting = true;
+    this.selectedRequestMessage = '';
+
+    this.stylingRequestService.markStylingRequestAsDone(selectedRequest.id).subscribe({
+      next: (updatedRequest) => {
+        this.doneSubmitting = false;
+        this.handleUpdatedRequest(updatedRequest);
+
+        void Swal.fire({
+          icon: 'success',
+          title: 'Demande clôturée',
+          text: 'La demande est maintenant marquée comme terminée.',
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#a46e51',
+        });
+      },
+      error: (error) => {
+        this.doneSubmitting = false;
+        this.selectedRequestMessage = this.getErrorMessage(error, 'Impossible de marquer la demande comme terminée pour le moment.');
+      },
+    });
+  }
+
   statusLabel(status: string): string {
     switch (status) {
       case 'ACCEPTED':
         return 'Acceptée';
       case 'REFUSED':
         return 'Refusée';
+      case 'DONE':
+        return 'Terminée';
       default:
         return 'En attente';
     }
@@ -368,6 +615,32 @@ export class StylingRequestComponent implements OnInit {
     const ville = request.styliste?.ville;
     const parts = [style ? `Style ${style}` : '', ville ? ville : ''].filter(Boolean);
     return parts.join(' · ') || 'Styliste';
+  }
+
+  requestActionLabel(): string {
+    return this.viewerRole === 'STYLISTE' ? 'Proposer' : 'Voir';
+  }
+
+  proposalStatusLabel(status: string): string {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'Acceptée';
+      case 'REFUSED':
+        return 'Refusée';
+      default:
+        return 'En attente de réponse';
+    }
+  }
+
+  proposalStatusTone(status: string): string {
+    switch (status) {
+      case 'ACCEPTED':
+        return 'accepted';
+      case 'REFUSED':
+        return 'refused';
+      default:
+        return 'pending';
+    }
   }
 
   private loadFashionistaContext(userId: number): void {
@@ -427,6 +700,9 @@ export class StylingRequestComponent implements OnInit {
         this.requests = requests;
         this.isLoading = false;
         this.ensureVisibleTab();
+        if (!this.applyPendingRouteSelection()) {
+          this.ensureSelectedRequest();
+        }
       },
       error: () => {
         this.isLoading = false;
@@ -441,6 +717,9 @@ export class StylingRequestComponent implements OnInit {
         this.requests = requests;
         this.isLoading = false;
         this.ensureVisibleTab();
+        if (!this.applyPendingRouteSelection()) {
+          this.ensureSelectedRequest();
+        }
       },
       error: () => {
         this.isLoading = false;
@@ -490,6 +769,153 @@ export class StylingRequestComponent implements OnInit {
     );
 
     this.ensureVisibleTab();
+  }
+
+  private handleUpdatedRequest(updatedRequest: StylingRequest): void {
+    this.updateRequestInList(updatedRequest);
+
+    if (this.selectedRequestId === updatedRequest.id) {
+      this.loadSelectedRequestWorkspace(updatedRequest.id);
+    }
+  }
+
+  private ensureSelectedRequest(): void {
+    const selectedRequest = this.selectedRequest ?? this.requests[0] ?? null;
+
+    if (!selectedRequest) {
+      this.resetWorkspace();
+      return;
+    }
+
+    this.selectedRequestId = selectedRequest.id;
+    this.loadSelectedRequestWorkspace(selectedRequest.id);
+  }
+
+  private applyPendingRouteSelection(): boolean {
+    if (this.pendingRequestSelectionId === null) {
+      return false;
+    }
+
+    const selectedRequest = this.requests.find((request) => request.id === this.pendingRequestSelectionId) ?? null;
+    if (!selectedRequest) {
+      return false;
+    }
+
+    this.activeTab = selectedRequest.status as RequestTab;
+    this.isRequestModalOpen = this.openPendingRequestModal;
+    this.selectRequest(selectedRequest);
+    return true;
+  }
+
+  private loadSelectedRequestWorkspace(requestId: number): void {
+    this.loadProposalsForRequest(requestId);
+
+    if (this.viewerRole === 'STYLISTE') {
+      const selectedRequest = this.selectedRequest;
+      if (selectedRequest?.status === 'ACCEPTED') {
+        this.loadWardrobeForSelectedRequest(selectedRequest);
+      } else {
+        this.selectedRequestWardrobe = [];
+        this.wardrobeLoading = false;
+      }
+    }
+  }
+
+  private loadProposalsForRequest(requestId: number): void {
+    this.proposalLoading = true;
+    this.selectedRequestMessage = '';
+
+    this.stylingProposalService.getByRequestId(requestId).subscribe({
+      next: (proposals) => {
+        this.selectedRequestProposals = proposals;
+        this.proposalLoading = false;
+        this.syncProposalDecisionDrafts();
+      },
+      error: (error) => {
+        this.selectedRequestProposals = [];
+        this.proposalLoading = false;
+        this.selectedRequestMessage = this.getErrorMessage(error, 'Impossible de charger les propositions pour le moment.');
+      },
+    });
+  }
+
+  private loadWardrobeForSelectedRequest(request: StylingRequest): void {
+    const fashionistaUserId = this.getUserId(request.fashionista);
+
+    if (fashionistaUserId === null) {
+      this.selectedRequestWardrobe = [];
+      this.selectedRequestMessage = 'Impossible d’identifier la fashionista pour accéder au dressing.';
+      return;
+    }
+
+    this.wardrobeLoading = true;
+
+    this.clothingItemService.getFashionistaWardrobe(fashionistaUserId).subscribe({
+      next: (items) => {
+        this.selectedRequestWardrobe = items;
+        this.wardrobeLoading = false;
+      },
+      error: (error) => {
+        this.selectedRequestWardrobe = [];
+        this.wardrobeLoading = false;
+        this.selectedRequestMessage = this.getErrorMessage(error, 'Impossible de charger le dressing de la fashionista.');
+      },
+    });
+  }
+
+  private syncProposalDecisionDrafts(): void {
+    const draftReasons: Record<number, string> = {};
+
+    for (const proposal of this.selectedRequestProposals) {
+      if (proposal.status === 'PENDING_REVIEW') {
+        draftReasons[proposal.id] = this.proposalDecisionReasons[proposal.id] ?? '';
+      }
+    }
+
+    this.proposalDecisionReasons = draftReasons;
+  }
+
+  private resetWorkspace(): void {
+    this.selectedRequestId = null;
+    this.selectedRequestMessage = '';
+    this.selectedRequestProposals = [];
+    this.selectedRequestWardrobe = [];
+    this.proposalDecisionReasons = {};
+    this.proposalForm = this.createEmptyProposalForm();
+    this.proposalLoading = false;
+    this.wardrobeLoading = false;
+  }
+
+  private getUserId(ref?: StylingRequestUserRef): number | null {
+    return ref?.userId ?? ref?.user?.id ?? null;
+  }
+
+  resolveImageUrl(imagePath: string | null | undefined): string {
+    if (!imagePath) {
+      return '';
+    }
+
+    const trimmedPath = imagePath.trim();
+
+    if (/^(https?:)?\/\//.test(trimmedPath) || trimmedPath.startsWith('data:')) {
+      return trimmedPath;
+    }
+
+    const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+
+    if (trimmedPath.includes('/')) {
+      return `${baseUrl}/${trimmedPath.replace(/^\/+/, '')}`;
+    }
+
+    return `${baseUrl}/uploads/profiles/${encodeURIComponent(trimmedPath)}`;
+  }
+
+  private createEmptyProposalForm(): StylingProposalForm {
+    return {
+      title: '',
+      stylistNote: '',
+      clothingItemIds: [],
+    };
   }
 
   private isRequestValid(): boolean {

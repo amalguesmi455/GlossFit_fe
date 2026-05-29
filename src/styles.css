@@ -966,9 +966,7 @@
  
   /* FOOTER */
   footer {
-    background: var(--noir);
     color: rgba(255,255,255,0.5);
-    padding: 3rem;
     display: flex;
     align-items: center;
     justify-content: space-between;

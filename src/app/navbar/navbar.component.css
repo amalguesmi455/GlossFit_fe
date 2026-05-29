@@ -265,7 +265,21 @@
   font-weight: 900;
   height: 29px;
   justify-content: center;
+  overflow: hidden;
   width: 29px;
+}
+
+.user-avatar-img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.user-avatar-icon {
+  color: var(--button-text);
+  font-size: 15px;
+  line-height: 1;
 }
 
 .user-name {

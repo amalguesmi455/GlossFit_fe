@@ -3,7 +3,17 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, catchError, map, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { AuthResponse, AuthUser, RegisterRequest, SignInRequest, UserRole } from './auth.models';
+import {
+  ApiMessage,
+  AuthResponse,
+  AuthUser,
+  ChangePasswordRequest,
+  ForgotPasswordRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+  SignInRequest,
+  UserRole,
+} from './auth.models';
 
 const ACCESS_TOKEN_KEY = 'glossfit_access_token';
 const REFRESH_TOKEN_KEY = 'glossfit_refresh_token';
@@ -44,6 +54,30 @@ export class AuthService {
 
   verifyEmail(token: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.authUrl}/verify-email`, { token }).pipe(
+      catchError(error => this.handleAuthError(error))
+    );
+  }
+
+  requestPasswordReset(payload: ForgotPasswordRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.authUrl}/forgot-password`, payload).pipe(
+      catchError(error => this.handleAuthError(error))
+    );
+  }
+
+  resetPassword(payload: ResetPasswordRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.authUrl}/reset-password`, payload).pipe(
+      catchError(error => this.handleAuthError(error))
+    );
+  }
+
+  changePassword(payload: ChangePasswordRequest): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.authUrl}/change-password`, payload).pipe(
+      catchError(error => this.handleAuthError(error))
+    );
+  }
+
+  deleteCurrentAccount(): Observable<ApiMessage> {
+    return this.http.delete<ApiMessage>(`${this.authUrl}/delete-account`).pipe(
       catchError(error => this.handleAuthError(error))
     );
   }
@@ -95,6 +129,11 @@ export class AuthService {
 
     const user = this.toUser(response);
 
+    if (response.active === false || user.active === false) {
+      this.logout();
+      throw new Error(response.message || 'Votre compte est inactif. Veuillez contacter l’administration de la plateforme.');
+    }
+
     localStorage.setItem(ACCESS_TOKEN_KEY, response.accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
     localStorage.setItem(USER_KEY, JSON.stringify(user));
@@ -127,6 +166,7 @@ export class AuthService {
       email: response.email,
       role: this.normalizeRole(response.role),
       hasProfile: this.readHasProfile(response),
+      active: response.active,
     };
   }
 

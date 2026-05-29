@@ -20,6 +20,10 @@ export class SigninComponent {
   password = '';
   message = '';
   isLoading = false;
+  isForgotMode = false;
+  forgotEmail = '';
+  forgotMessage = '';
+  isForgotLoading = false;
 
   constructor(
     private authService: AuthService,
@@ -61,6 +65,45 @@ export class SigninComponent {
           icon: 'error',
           title: 'Connexion impossible',
           text: this.message,
+          confirmButtonText: 'Réessayer',
+          confirmButtonColor: '#a46e51',
+        });
+      }
+    });
+  }
+
+  toggleForgotMode(): void {
+    this.isForgotMode = !this.isForgotMode;
+    this.message = '';
+    this.forgotMessage = '';
+    if (this.isForgotMode && !this.forgotEmail) {
+      this.forgotEmail = this.email;
+    }
+  }
+
+  sendPasswordReset(): void {
+    this.forgotMessage = '';
+    this.isForgotLoading = true;
+
+    this.authService.requestPasswordReset({ email: this.forgotEmail }).subscribe({
+      next: (response) => {
+        this.isForgotLoading = false;
+        this.forgotMessage = response.message || 'Vérifier votre email pour la réinitialisation du mot de passe.';
+        void Swal.fire({
+          icon: 'success',
+          title: 'Email envoyé',
+          text: this.forgotMessage,
+          confirmButtonText: 'OK',
+          confirmButtonColor: '#a46e51',
+        });
+      },
+      error: (error: Error) => {
+        this.isForgotLoading = false;
+        this.forgotMessage = error.message;
+        void Swal.fire({
+          icon: 'error',
+          title: 'Demande impossible',
+          text: this.forgotMessage,
           confirmButtonText: 'Réessayer',
           confirmButtonColor: '#a46e51',
         });

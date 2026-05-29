@@ -6,8 +6,9 @@ import Swal from 'sweetalert2';
 
 import { AdminProfile, AdminProfileData, AdminProfileService } from '../core/admin-profile.service';
 import { AuthService } from '../core/auth/auth.service';
-import { FashionistaProfile } from '../core/fashionista-profile.service';
-import { StylisteProfile } from '../core/styliste-profile.service';
+import { FashionistaProfile, FashionistaProfileService } from '../core/fashionista-profile.service';
+import { StylisteProfile, StylisteProfileService } from '../core/styliste-profile.service';
+import { environment } from '../../environments/environment';
 
 type AdminTab = 'fashionistas' | 'stylistes' | 'admins';
 
@@ -26,6 +27,7 @@ export class AdminDashbordComponent implements OnInit {
   showAdminForm = false;
   profileLookupId: number | null = null;
   selectedAdminProfile: AdminProfile | null = null;
+  private adminProfileId: number | null = null;
 
   adminForm: AdminProfileData = {
     userId: 0,
@@ -40,6 +42,8 @@ export class AdminDashbordComponent implements OnInit {
 
   constructor(
     private adminProfileService: AdminProfileService,
+    private fashionistaProfileService: FashionistaProfileService,
+    private stylisteProfileService: StylisteProfileService,
     private authService: AuthService
   ) {}
 
@@ -68,6 +72,10 @@ export class AdminDashbordComponent implements OnInit {
     return this.activeTab === 'fashionistas' ? this.fashionistas : this.stylistes;
   }
 
+  get activeTabLabel(): string {
+    return this.activeTab === 'fashionistas' ? 'Fashionistas' : 'Stylistes';
+  }
+
   switchTab(tab: AdminTab): void {
     this.activeTab = tab;
     this.message = '';
@@ -79,13 +87,6 @@ export class AdminDashbordComponent implements OnInit {
       return;
     }
 
-    const adminId = this.adminId;
-    if (!adminId) {
-      this.message = 'Admin not connected.';
-      void this.showError(this.message);
-      return;
-    }
-
     this.isLoading = true;
     this.message = '';
 
@@ -93,28 +94,16 @@ export class AdminDashbordComponent implements OnInit {
       this.adminProfileService.getAllAdminProfiles()
         .pipe(finalize(() => this.isLoading = false))
         .subscribe({
-          next: (profiles: AdminProfile[]) => this.adminProfiles = profiles,
+          next: (profiles: AdminProfile[]) => {
+            this.adminProfiles = profiles;
+            this.syncAdminContextFromProfiles();
+          },
           error: (error: any) => this.handleError(error, 'Unable to load admin profiles.'),
         });
       return;
     }
 
-    if (this.activeTab === 'fashionistas') {
-      this.adminProfileService.getAllFashionistas(adminId)
-        .pipe(finalize(() => this.isLoading = false))
-        .subscribe({
-          next: (profiles: FashionistaProfile[]) => this.fashionistas = profiles,
-          error: (error: any) => this.handleError(error, 'Unable to load profiles.'),
-        });
-      return;
-    }
-
-    this.adminProfileService.getAllStylistes(adminId)
-      .pipe(finalize(() => this.isLoading = false))
-      .subscribe({
-        next: (profiles: StylisteProfile[]) => this.stylistes = profiles,
-        error: (error: any) => this.handleError(error, 'Unable to load profiles.'),
-      });
+    this.loadProfilesWithFallback(this.getAdminRequestCandidates());
   }
 
   saveAdminProfile(): void {
@@ -277,8 +266,158 @@ export class AdminDashbordComponent implements OnInit {
     return `${profile.prenom || ''} ${profile.nom || ''}`.trim() || 'Profile without name';
   }
 
+  profileEmail(profile: FashionistaProfile | StylisteProfile): string {
+    return profile.user?.email || 'Email non renseigne';
+  }
+
+  profilePictureUrl(profile: FashionistaProfile | StylisteProfile): string | null {
+    const raw = profile as unknown as Record<string, unknown>;
+    const value =
+      raw['profilePictureUrl'] ??
+      raw['profilePictureFileName'] ??
+      raw['profilePicture'] ??
+      raw['pictureUrl'] ??
+      raw['imageUrl'] ??
+      raw['photoUrl'] ??
+      raw['profileImageUrl'] ??
+      raw['profile_image_url'] ??
+      raw['avatarUrl'] ??
+      null;
+
+    if (!value || typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmed = value.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const baseUrl = environment.apiUrl.replace(/\/api$/, '');
+
+    if (/^(https?:)?\/\//.test(trimmed) || trimmed.startsWith('data:')) {
+      return trimmed;
+    }
+
+    if (trimmed.startsWith('/')) {
+      return `${baseUrl}${trimmed}`;
+    }
+
+    if (trimmed.includes('/')) {
+      return `${baseUrl}/${trimmed.replace(/^\/+/, '')}`;
+    }
+
+    return `${baseUrl}/uploads/profiles/${encodeURIComponent(trimmed)}`;
+  }
+
+  profileInitials(profile: FashionistaProfile | StylisteProfile): string {
+    const firstName = (profile.prenom || '').trim();
+    const lastName = (profile.nom || '').trim();
+    const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.trim();
+    return initials || '?';
+  }
+
+  isProfileActive(profile: FashionistaProfile | StylisteProfile): boolean {
+    return profile.active ?? profile.user?.active ?? true;
+  }
+
+  resolveAccountUserId(profile: FashionistaProfile | StylisteProfile): number | null {
+    return profile.userId ?? profile.user?.id ?? null;
+  }
+
+  profileStatusLabel(profile: FashionistaProfile | StylisteProfile): string {
+    return this.isProfileActive(profile) ? 'Active' : 'Inactive';
+  }
+
+  profileStatusTitle(profile: FashionistaProfile | StylisteProfile): string {
+    return this.isProfileActive(profile)
+      ? 'Cliquer pour desactiver le compte'
+      : 'Cliquer pour reactiver le compte';
+  }
+
+  toggleFashionistaStatus(profile: FashionistaProfile): void {
+    this.toggleProfileStatus('fashionistas', profile);
+  }
+
+  toggleStylisteStatus(profile: StylisteProfile): void {
+    this.toggleProfileStatus('stylistes', profile);
+  }
+
   private resolveProfileUserId(profile: AdminProfile): number {
     return profile.userId ?? profile.user?.id ?? this.adminId ?? 0;
+  }
+
+  private getAdminContextId(): number | null {
+    return this.adminProfileId ?? this.adminProfiles.find(profile => profile.userId === this.adminId || profile.user?.id === this.adminId)?.id ?? null;
+  }
+
+  private getAdminRequestCandidates(): Array<number | undefined> {
+    const candidates = [this.adminId ?? undefined, this.adminProfileId ?? undefined, undefined];
+    const unique: Array<number | undefined> = [];
+
+    for (const candidate of candidates) {
+      if (candidate === undefined) {
+        if (!unique.includes(undefined)) {
+          unique.push(undefined);
+        }
+        continue;
+      }
+
+      if (!unique.includes(candidate)) {
+        unique.push(candidate);
+      }
+    }
+
+    return unique;
+  }
+
+  private loadProfilesWithFallback(candidates: Array<number | undefined>, index = 0): void {
+    if (index >= candidates.length) {
+      this.isLoading = false;
+      this.message = 'Unable to load profiles.';
+      void this.showError(this.message);
+      return;
+    }
+
+    const adminContextId = candidates[index];
+    if (this.activeTab === 'fashionistas') {
+      this.adminProfileService.getAllFashionistas(adminContextId).subscribe({
+        next: (profiles: FashionistaProfile[]) => {
+          this.fashionistas = profiles;
+          this.isLoading = false;
+        },
+        error: () => this.loadProfilesWithFallback(candidates, index + 1),
+      });
+      return;
+    }
+
+    this.adminProfileService.getAllStylistes(adminContextId).subscribe({
+      next: (profiles: StylisteProfile[]) => {
+        this.stylistes = profiles;
+        this.isLoading = false;
+      },
+      error: () => this.loadProfilesWithFallback(candidates, index + 1),
+    });
+  }
+
+  private syncAdminContextFromProfiles(): void {
+    const matched = this.adminProfiles.find(profile => profile.userId === this.adminId || profile.user?.id === this.adminId);
+    this.adminProfileId = matched?.id ?? null;
+  }
+
+  private loadAdminContextAndProfiles(): void {
+    this.adminProfileService.getAllAdminProfiles().subscribe({
+      next: (profiles) => {
+        this.adminProfiles = profiles;
+        this.syncAdminContextFromProfiles();
+        this.loadProfiles();
+      },
+      error: () => {
+        this.adminProfiles = [];
+        this.adminProfileId = null;
+        this.loadProfiles();
+      },
+    });
   }
 
   private upsertAdminProfile(profile: AdminProfile): void {
@@ -296,6 +435,76 @@ export class AdminDashbordComponent implements OnInit {
     this.adminProfiles = [profile, ...this.adminProfiles];
   }
 
+  private toggleProfileStatus(
+    kind: 'fashionistas' | 'stylistes',
+    profile: FashionistaProfile | StylisteProfile,
+  ): void {
+    const userId = this.resolveAccountUserId(profile);
+
+    if (!userId) {
+      void this.showError('User ID missing.');
+      return;
+    }
+
+    const nextActive = !this.isProfileActive(profile);
+    const label = kind === 'fashionistas' ? 'fashionista' : 'styliste';
+    const confirmation = nextActive
+      ? `Reactiver ce compte ${label} ?`
+      : `Desactiver ce compte ${label} ?`;
+
+    void Swal.fire({
+      icon: nextActive ? 'question' : 'warning',
+      title: confirmation,
+      text: nextActive
+        ? 'Le compte pourra de nouveau se connecter.'
+        : 'Le compte ne pourra plus se connecter tant qu\'il reste inactif.',
+      showCancelButton: true,
+      confirmButtonText: nextActive ? 'Reactiver' : 'Desactiver',
+      cancelButtonText: 'Annuler',
+      confirmButtonColor: nextActive ? '#2f8f46' : '#c0503a',
+      cancelButtonColor: '#a46e51',
+    }).then(result => {
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      this.isSaving = true;
+
+      if (kind === 'fashionistas') {
+        this.fashionistaProfileService.updateAccountStatus(profile as FashionistaProfile, nextActive, userId).subscribe({
+          next: (updated: FashionistaProfile) => {
+            this.fashionistas = this.fashionistas.map(item => item.userId === userId ? { ...item, ...updated } : item);
+            this.isSaving = false;
+            this.message = nextActive
+              ? 'Compte reactiver avec succes.'
+              : 'Compte desactive avec succes.';
+            void this.showSuccess(this.message);
+          },
+          error: (error: any) => {
+            this.isSaving = false;
+            this.handleError(error, 'Unable to update account status.');
+          },
+        });
+        return;
+      }
+
+      this.stylisteProfileService.updateAccountStatus(profile as StylisteProfile, nextActive, userId).subscribe({
+        next: (updated: StylisteProfile) => {
+          this.stylistes = this.stylistes.map(item => item.userId === userId ? { ...item, ...updated } : item);
+          this.isSaving = false;
+          this.message = nextActive
+            ? 'Compte reactiver avec succes.'
+            : 'Compte desactive avec succes.';
+          void this.showSuccess(this.message);
+        },
+        error: (error: any) => {
+          this.isSaving = false;
+          this.handleError(error, 'Unable to update account status.');
+        },
+      });
+    });
+  }
+
   private readError(error: any, fallback: string): string {
     if (error?.status === 403) {
       return 'Acces refuse: connecte-toi avec un compte ADMIN. Le compte actuel ne peut pas consulter ces profils.';
@@ -303,6 +512,10 @@ export class AdminDashbordComponent implements OnInit {
 
     if (error?.status === 401) {
       return 'Session expiree: reconnecte-toi avec un compte ADMIN.';
+    }
+
+    if (String(error?.error?.message || error?.message || '').toLowerCase().includes('inactive')) {
+      return 'Ce compte est desactive. L\'utilisateur ne peut plus se connecter.';
     }
 
     return error?.error?.error || error?.error?.message || error?.message || fallback;

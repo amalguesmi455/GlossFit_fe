@@ -21,10 +21,11 @@ export const authInterceptor: HttpInterceptorFn = (
   // ── 2. Handle response errors ────────────────────────────────────────────
   return next(authedRequest).pipe(
     catchError((error: unknown) => {
-      // Only attempt a token refresh on 401 or 403
+      // Only attempt a token refresh on 401.
+      // A 403 means the token is valid but the current user is not allowed.
       if (
         error instanceof HttpErrorResponse &&
-        (error.status === 401 || error.status === 403) &&
+        error.status === 401 &&
         !request.url.includes('/auth/')   // never retry auth endpoints themselves
       ) {
         return authService.refreshToken().pipe(

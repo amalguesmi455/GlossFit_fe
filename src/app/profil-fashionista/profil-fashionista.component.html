@@ -29,7 +29,7 @@
                alt="Photo de profil"
                class="avatar-img" />
           <ng-template #initials>
-            <span class="avatar-initial">{{ avatarInitial }}</span>
+            <i class="fa-solid fa-circle-user avatar-icon" aria-hidden="true"></i>
           </ng-template>
           <div class="avatar-overlay" *ngIf="isEditing">
             <i class="fa-solid fa-camera"></i>
@@ -60,7 +60,7 @@
 
       <div class="mini-board">
         <div class="board-head">
-          <span><i class="fa-solid fa-palette"></i> Préférences</span>
+          <span><i class="fa-solid fa-heart"></i> Préférences</span>
           <small>{{ profile.ville }}</small>
         </div>
         <div class="tag-row">
@@ -70,7 +70,7 @@
           <span>{{ profile.morphologie }}</span>
         </div>
         <div class="actions profile-actions">
-          <a class="btn primary" routerLink="/demand">
+          <a class="btn primary" routerLink="/styling-request">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Demander un style
           </a>
           <a class="btn soft" routerLink="/dressing">
@@ -191,15 +191,14 @@
             <label for="ville">Ville</label>
             <input id="ville" name="ville" [(ngModel)]="draft.ville" />
           </div>
-          <div class="field">
-            <label for="style">Style préféré</label>
-            <input id="style" name="style" [(ngModel)]="draft.style" />
-          </div>
         </div>
         <div class="form-grid">
           <div class="field">
             <label for="taille">Taille</label>
-            <input id="taille" name="taille" [(ngModel)]="draft.taille" />
+            <select id="taille" name="taille" [(ngModel)]="draft.taille">
+              <option value="">Choisir une taille</option>
+              <option *ngFor="let t of tailles" [value]="t.value">{{ t.label }}</option>
+            </select>
           </div>
           <div class="field">
             <label for="poids">Poids (kg)</label>
@@ -209,12 +208,25 @@
         <div class="form-grid">
           <div class="field">
             <label for="skinTone">Carnation</label>
-            <input id="skinTone" name="skinTone" [(ngModel)]="draft.skinTone" />
+            <select id="skinTone" name="skinTone" [(ngModel)]="draft.skinTone">
+              <option value="">Choisir une carnation</option>
+              <option *ngFor="let s of skinTones" [value]="s.value">{{ s.label }}</option>
+            </select>
           </div>
           <div class="field">
             <label for="morphologie">Morphologie</label>
-            <input id="morphologie" name="morphologie" [(ngModel)]="draft.morphologie" />
+            <select id="morphologie" name="morphologie" [(ngModel)]="draft.morphologie">
+              <option value="">Choisir une morphologie</option>
+              <option *ngFor="let m of morphologies" [value]="m.value">{{ m.label }}</option>
+            </select>
           </div>
+        </div>
+        <div class="field">
+          <label for="style">Style préféré</label>
+          <select id="style" name="style" [(ngModel)]="draft.style">
+            <option value="">Choisir un style</option>
+            <option *ngFor="let s of styleOptions" [value]="s.value">{{ s.label }}</option>
+          </select>
         </div>
 
         <!-- New photo preview -->

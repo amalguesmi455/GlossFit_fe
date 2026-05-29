@@ -9,10 +9,10 @@
       <h1 id="signin-title">Bienvenue sur GlossFit.</h1>
       <p class="lead">Connecte-toi pour créer et explorer ton espace style.</p>
 
-      <form class="form" (ngSubmit)="signin()" novalidate>
+      <form class="form" *ngIf="!isForgotMode" (ngSubmit)="signin()" novalidate>
         <label class="field" for="email">
           <span>Email</span>
-          <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="amal@email.com" autocomplete="email">
+          <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="amal@gmail.com" autocomplete="email">
         </label>
 
         <label class="field" for="password">
@@ -26,7 +26,24 @@
         </button>
       </form>
 
+      <form class="form" *ngIf="isForgotMode" (ngSubmit)="sendPasswordReset()" novalidate>
+        <label class="field" for="forgotEmail">
+          <span>Email du compte</span>
+          <input id="forgotEmail" name="forgotEmail" type="email" [(ngModel)]="forgotEmail" required placeholder="amal@gmail.com" autocomplete="email">
+        </label>
+
+        <button class="btn primary" type="submit" [disabled]="isForgotLoading">
+          <i class="fa-solid fa-paper-plane"></i>
+          {{ isForgotLoading ? 'Envoi...' : 'Envoyer le lien' }}
+        </button>
+      </form>
+
+      <button class="forgot-link" type="button" (click)="toggleForgotMode()">
+        {{ isForgotMode ? 'Retour à la connexion' : 'Mot de passe oublié ?' }}
+      </button>
+
       <p class="status" *ngIf="message"><i class="fa-solid fa-circle-info"></i>{{ message }}</p>
+      <p class="status" *ngIf="forgotMessage"><i class="fa-solid fa-envelope-open-text"></i>{{ forgotMessage }}</p>
 
       <p class="auth-link">Pas encore de compte ? <a routerLink="/signup">Commencer maintenant</a></p>
     </section>
